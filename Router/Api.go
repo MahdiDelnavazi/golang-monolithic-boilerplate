@@ -9,6 +9,7 @@ const (
 	prefix = "/api/v1"
 )
 
+//
 func Routes(app *gin.Engine) {
 	router := app.Group(prefix)
 
