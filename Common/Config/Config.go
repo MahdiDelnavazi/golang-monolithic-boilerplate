@@ -17,13 +17,13 @@ type EnvironmentConfig struct {
 		User         string `env:"DB_USER" env-default:"root"`
 		Password     string `env:"DB_PASSWORD" env-default:"secret"`
 		Host         string `env:"DB_HOST" env-default:"localhost"`
-		Name         string `env:"DB_NAME" env-default:"golang_monolithic_bilerplate"`
+		Name         string `env:"DB_NAME" env-default:"golang_monolithic_boilerplate"`
 		MaxIdleConns int    `env:"DB_MAX_IDLE_CONNS" env-default:"10"`
 		MaxOpenConns int    `env:"DB_MAX_OPEN_CONNS" env-default:"100"`
 		DisableTLS   bool   `env:"DB_DISABLE_TLS" env-default:"false"`
 	}
 	Redis struct {
-		Host     string `env:"REDIS_HOST" env-default:"localhost"`
+		Host     string `env:"REDIS_HOST" env-default:"localhost:6379"`
 		Password string `env:"REDIS_PASSWORD" env-default:""`
 		Port     string `env:"REDIS_PORT" env-default:"6379"`
 	}

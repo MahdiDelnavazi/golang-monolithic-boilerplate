@@ -15,6 +15,7 @@ type RedisConfig struct {
 var Redis *redis.Client
 
 func RedisConnection(cfg EnvironmentConfig) {
+	fmt.Println("this is reddis database : ", cfg.Redis)
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.Redis.Host,
 		Password: cfg.Redis.Password,
@@ -25,5 +26,6 @@ func RedisConnection(cfg EnvironmentConfig) {
 	if err != nil {
 		log.Fatalf("cannot connect to redis : %s ", err)
 	}
+	Redis = client
 	fmt.Println(pong, err)
 }

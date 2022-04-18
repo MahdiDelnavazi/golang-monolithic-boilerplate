@@ -14,7 +14,7 @@ type PasetoMaker struct {
 	symmetricKey []byte
 }
 
-var maker Maker
+var MakerPaseto Maker
 var err error
 
 func NewPasetoMaker(symmetricKey string) {
@@ -22,7 +22,7 @@ func NewPasetoMaker(symmetricKey string) {
 		log.Fatal("cannot create token: %W", "invalid key size: must be exactly %d characters", chacha20poly1305.KeySize)
 	}
 
-	maker = &PasetoMaker{
+	MakerPaseto = &PasetoMaker{
 		paseto:       paseto.NewV2(),
 		symmetricKey: []byte(symmetricKey),
 	}

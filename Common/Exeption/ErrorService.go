@@ -1,4 +1,4 @@
-package Common
+package Exeption
 
 import "encoding/json"
 

@@ -34,6 +34,11 @@ func main() {
 		MaxOpenConns: config.DB.MaxOpenConns,
 		DisableTLS:   config.DB.DisableTLS,
 	})
+	//defer func() {
+	//	Config.PostgresDB.Close()
+	//	fmt.Println("database in disconnected ")
+	//}()
+	//fmt.Println("this is database2 : ", Config.PostgresDB)
 
 	// =====================================================
 	// Create new token maker
@@ -49,5 +54,11 @@ func main() {
 	app.MaxMultipartMemory = 8 << 20
 	app.Static("/assets/", "./public")
 	Router.Routes(app)
+
+	errorChannel := make(chan error)
+	func() {
+		Config.Logger.Infow("Project Running On PORT", config.Api.ApiHost)
+		errorChannel <- app.Run(config.Api.ApiHost)
+	}()
 
 }

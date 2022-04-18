@@ -1,6 +1,7 @@
 package Config
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
@@ -20,6 +21,7 @@ type DatabaseConfig struct {
 }
 
 var PostgresDB *sqlx.DB
+var err error
 
 // DatabaseOpen Open knows how to open a database connection based on the configuration.
 func DatabaseOpen(cfg DatabaseConfig) {
@@ -36,15 +38,12 @@ func DatabaseOpen(cfg DatabaseConfig) {
 	q.Set("dbname", cfg.Name)
 
 	databaseConfig := strings.Replace(q.Encode(), "&", " ", -1)
-	PostgresDB, err := sqlx.Open("postgres", databaseConfig)
+	fmt.Println("this is database : ", databaseConfig)
+	PostgresDB, err = sqlx.Open("postgres", databaseConfig)
 	if err != nil {
 		log.Fatal("cannot connect to db: ", err)
 	}
 	PostgresDB.SetMaxIdleConns(cfg.MaxIdleConns)
 	PostgresDB.SetMaxOpenConns(cfg.MaxOpenConns)
-
-	defer func() {
-		PostgresDB.Close()
-	}()
 
 }

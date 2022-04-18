@@ -1,9 +1,10 @@
-package Common
+package Validator
 
 import (
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"golang_monolithic_bilerplate/Common/Exeption"
 	"reflect"
 	"strings"
 )
@@ -52,9 +53,9 @@ func ValidationCheck(val interface{}) error {
 			return err
 		}
 
-		var fields FieldErrors
+		var fields Exeption.FieldErrors
 		for _, verror := range verrors {
-			field := FieldError{
+			field := Exeption.FieldError{
 				Field: verror.Field(),
 				Error: verror.Translate(translator),
 			}
