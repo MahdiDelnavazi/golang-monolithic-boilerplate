@@ -1,7 +1,6 @@
 package Ticket
 
 import (
-	"go.uber.org/zap"
 	"golang_monolithic_bilerplate/Common/Validator"
 	Ticket "golang_monolithic_bilerplate/Components/Ticket/Request"
 	"golang_monolithic_bilerplate/Components/Ticket/Response"
@@ -12,11 +11,10 @@ import (
 type TicketService struct {
 	ticketRepository *TicketRepository
 	userService      *Controller.UserService
-	logger           *zap.SugaredLogger
 }
 
-func NewTicketService(logger *zap.SugaredLogger, userService *Controller.UserService, ticketRepository *TicketRepository) *TicketService {
-	return &TicketService{logger: logger, userService: userService, ticketRepository: ticketRepository}
+func NewTicketService(userService *Controller.UserService, ticketRepository *TicketRepository) *TicketService {
+	return &TicketService{userService: userService, ticketRepository: ticketRepository}
 }
 
 func (ticketService TicketService) CreateTicket(createTicketRequest Ticket.CreateTicketRequest) (Response.CreateTicketResponse, error) {

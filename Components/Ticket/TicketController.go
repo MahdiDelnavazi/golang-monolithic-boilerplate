@@ -2,7 +2,6 @@ package Ticket
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"golang_monolithic_bilerplate/Common/Helper"
 	"golang_monolithic_bilerplate/Common/Response"
 	Ticket "golang_monolithic_bilerplate/Components/Ticket/Request"
@@ -12,12 +11,11 @@ import (
 )
 
 type TicketController struct {
-	logger        *zap.SugaredLogger
 	ticketService *TicketService
 }
 
-func NewTicketController(logger *zap.SugaredLogger, ticketService *TicketService) *TicketController {
-	return &TicketController{logger: logger, ticketService: ticketService}
+func NewTicketController(ticketService *TicketService) *TicketController {
+	return &TicketController{ticketService: ticketService}
 }
 
 func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
