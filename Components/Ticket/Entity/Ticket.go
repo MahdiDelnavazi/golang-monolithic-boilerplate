@@ -1,15 +1,16 @@
 package Entity
 
 import (
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
 type Ticket struct {
-	UserId    uuid.UUID
-	Like      bool
-	Subject   string
-	Message   string
-	Image     string
-	CreatedAt time.Time
+	ID        primitive.ObjectID `bson:"_id"`
+	UserId    primitive.ObjectID `bson:"UserId"`
+	Like      bool               `bson:"Like"`
+	Subject   string             `bson:"Subject"`
+	Message   string             `bson:"Message"`
+	Image     string             `bson:"Image"`
+	CreatedAt time.Time          `bson:"CreatedAt"`
 }

@@ -9,7 +9,7 @@ import (
 type AuthService struct {
 }
 
-func NewAuthUserService() *AuthService {
+func NewAuthService() *AuthService {
 	return &AuthService{}
 }
 

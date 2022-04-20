@@ -41,14 +41,17 @@ func Routes(app *gin.Engine) {
 	newTicketService := Ticket.NewTicketService(newUserService, newTicketRepository)
 	newTicketController := Ticket.NewTicketController(newTicketService)
 
-	newAuthController := Controller3.NewAuthController()
+	newAuthService := Controller3.NewAuthService()
+	newAuthController := Controller3.NewAuthController(newAuthService)
 
-	authRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
+	authTicketRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
+	authUserRoutes := routerUser.Group("/").Use(Middleware.AuthMiddleware())
 
 	routerUser.POST("/create", newUserController.CreateUser)
 	routerUser.POST("/login", newUserController.LoginUser)
 	routerUser.POST("/logout", newAuthUserController.Logout)
 	authUser.POST("/newToken", newAuthController.AccessToken)
-	authRoutes.POST("/create", newTicketController.CreateTicket)
+	authTicketRoutes.POST("/create", newTicketController.CreateTicket)
+	authUserRoutes.POST("/getAll", newUserController.GetAllUsers)
 
 }

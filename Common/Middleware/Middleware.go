@@ -22,13 +22,6 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
 
-		//val2 , _ :=redis.Get("token").Result()
-		//fmt.Println("redis resuuuuult : " , val2)
-		//if err != nil {
-		//	ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"errors": err})
-		//	return
-		//}
-
 		fmt.Println("this is token ------------>", authorizationHeader)
 		if len(authorizationHeader) == 0 {
 			err := errors.New("authorization header is not provided")
@@ -66,5 +59,6 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		ctx.Set(authorizationPayloadKey, payload)
 		ctx.Next()
+
 	}
 }

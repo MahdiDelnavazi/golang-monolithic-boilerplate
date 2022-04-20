@@ -1,6 +1,7 @@
 package Controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang_monolithic_bilerplate/Common/Helper"
 	Response "golang_monolithic_bilerplate/Common/Response"
@@ -74,19 +75,24 @@ func (userControler *UserController) LoginUser(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
-//func (userControler *UserController) Logout(context *gin.Context) {
-//	var userRequest User.LogoutRequest
-//	Helper.Decode(context.Request, &userRequest)
-//
-//	logoutResponse, logoutResponseError := userControler.userService.LogoutUser(userRequest)
-//
-//	if logoutResponseError != nil {
-//		context.JSON(http.StatusBadRequest, gin.H{"response": logoutResponseError})
-//		return
-//	}
-//
-//	// all ok
-//	// create general response
-//	response1 := Response.GeneralResponse{Error: false, Message: logoutResponse}
-//	context.JSON(http.StatusOK, gin.H{"response": response1})
-//}
+func (userController *UserController) GetAllUsers(context *gin.Context) {
+	var userRequest Request.GetAllUsers
+	Helper.Decode(context.Request, &userRequest)
+
+	validationError := Validator.ValidationCheck(userRequest)
+	log.Println(validationError)
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+	}
+
+	fmt.Println("user req ", userRequest)
+	result, responseError := userController.userService.GetAllUsers(userRequest.Page, userRequest.Limit)
+	if responseError != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"response": responseError})
+		return
+	}
+
+	response := Response.GeneralResponse{Error: false, Message: "successful", Data: result}
+	context.JSON(http.StatusOK, gin.H{"response": response})
+}

@@ -16,19 +16,19 @@ func NewTicketRepository() *TicketRepository {
 	return &TicketRepository{}
 }
 
-func (TicketRepository *TicketRepository) Create(request Ticket2.CreateTicketRequest) (Entity2.TicketMongo, error) {
-	ticket := Entity2.TicketMongo{}
+func (TicketRepository *TicketRepository) Create(request Ticket2.CreateTicketRequest) (Entity2.Ticket, error) {
+	ticket := Entity2.Ticket{}
 	//queryError := Config.DB.Get(&ticket, `SELECT * FROM newTicket($1 , $2 , $3 , $4, $5)`,
 	//	request.UserId, request.Subject, request.Message, request.Image, request.Like)
 
-	result, queryError := Config.TicketCollection.InsertOne(Config.DBCtx, Entity2.TicketMongo{ID: primitive.NewObjectID(), UserId: request.UserId,
+	result, queryError := Config.TicketCollection.InsertOne(Config.DBCtx, Entity2.Ticket{ID: primitive.NewObjectID(), UserId: request.UserId,
 		Subject: request.Subject, Message: request.Message, CreatedAt: time.Now()})
 
 	if queryError != nil {
-		return Entity2.TicketMongo{}, nil
+		return Entity2.Ticket{}, nil
 	}
 	if err := Config.TicketCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&ticket); err != nil {
-		return Entity2.TicketMongo{}, err
+		return Entity2.Ticket{}, err
 	}
 	return ticket, queryError
 

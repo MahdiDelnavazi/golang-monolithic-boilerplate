@@ -15,7 +15,7 @@ type UserService struct {
 }
 
 func NewUserService(userRepository *UserRepository) *UserService {
-	return &UserService{}
+	return &UserService{userRepository: userRepository}
 }
 
 func (userService UserService) Create(createUserRequest Request.CreateUserRequest) (Response.CreateUserResponse, error) {
@@ -59,10 +59,20 @@ func (userService UserService) LoginUser(loginUserRequest Request.LoginUserReque
 }
 
 func (userService UserService) GetUser(getUserRequest Request.GetUserRequest) (Response.GetUserResponse, error) {
-	user, getUserError := userService.userRepository.GetUser(getUserRequest)
+	user, getUserError := userService.userRepository.GetUserByUsername(getUserRequest.UserName)
 	if getUserError != nil {
 		return Response.GetUserResponse{}, getUserError
 	}
 	// we need a transformer
 	return Response.GetUserResponse{UserId: user.ID, UserName: user.UserName}, nil
+}
+
+func (userService UserService) GetAllUsers(page int, limit int) (Response.ResponseAllUsers, error) {
+
+	listUsers, err := userService.userRepository.GetAllUsers(page, limit)
+	if err != nil {
+		return Response.ResponseAllUsers{}, err
+	}
+
+	return Response.ResponseAllUsers{Users: listUsers}, nil
 }
