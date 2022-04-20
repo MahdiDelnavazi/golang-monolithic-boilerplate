@@ -4,47 +4,40 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang_monolithic_bilerplate/Common/Helper"
 	"golang_monolithic_bilerplate/Common/Response"
-	token "golang_monolithic_bilerplate/Common/Token"
+	"golang_monolithic_bilerplate/Common/Validator"
 	User "golang_monolithic_bilerplate/Components/Auth/Request"
 	Response2 "golang_monolithic_bilerplate/Components/Auth/Response"
+	"log"
 
 	"net/http"
-	"time"
 )
 
 type AuthController struct {
-
-	//userService *Service.UserService
+	authService *AuthService
 }
 
-func NewAuthController() *AuthController {
-	return &AuthController{}
+func NewAuthController(authService *AuthService) *AuthController {
+	return &AuthController{authService: authService}
 }
 
 func (authController *AuthController) AccessToken(context *gin.Context) {
 	var accessTokenReq User.AccessTokenRequest
 	Helper.Decode(context.Request, &accessTokenReq)
 
-	//logoutResponse, logoutResponseError := userControler.userService.LogoutUser(userRequest)
-
-	//if logoutResponseError != nil {
-	//	context.JSON(http.StatusBadRequest, gin.H{"response": logoutResponseError})
-	//	return
-	//}
-
-	payload, err := token.MakerPaseto.VerifyToken(accessTokenReq.AccessToken)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": err})
-		return
+	validationError := Validator.ValidationCheck(accessTokenReq)
+	log.Println(validationError)
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
 	}
-	newToken, err := token.MakerPaseto.CreateToken(payload.Username, time.Hour)
+
+	token, err := authController.authService.CreateAccessToken(accessTokenReq)
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": err})
-		return
+		context.JSON(http.StatusInternalServerError, gin.H{"response": err})
 	}
 
 	// all ok
 	// create general response
-	response1 := Response.GeneralResponse{Error: false, Message: "successful", Data: Response2.AccessTokenResponse{AccessToken: newToken}}
+	response1 := Response.GeneralResponse{Error: false, Message: "successful", Data: Response2.AccessTokenResponse{AccessToken: token}}
 	context.JSON(http.StatusOK, gin.H{"response": response1})
 }

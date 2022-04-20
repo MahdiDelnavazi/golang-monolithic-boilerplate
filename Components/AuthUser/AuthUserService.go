@@ -6,7 +6,7 @@ import (
 )
 
 type AuthUserService struct {
-	userRepository *AuthUserRepository
+	AuthUserRepository *AuthUserRepository
 }
 
 func NewAuthUserService(authUserRepository *AuthUserRepository) *AuthUserService {
@@ -16,7 +16,7 @@ func NewAuthUserService(authUserRepository *AuthUserRepository) *AuthUserService
 func (authUserService AuthUserService) LogoutUser(request User.LogoutRequest) (response string, err error) {
 	payload, _ := token.MakerPaseto.VerifyToken(request.Token)
 
-	err = authUserService.userRepository.LogOut(request, payload)
+	err = authUserService.AuthUserRepository.LogOut(request, payload)
 	if err != nil {
 		return "logout failed", err
 	}

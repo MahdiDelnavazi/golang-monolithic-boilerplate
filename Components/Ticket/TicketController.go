@@ -4,8 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang_monolithic_bilerplate/Common/Helper"
 	"golang_monolithic_bilerplate/Common/Response"
+	"golang_monolithic_bilerplate/Common/Validator"
 	Ticket "golang_monolithic_bilerplate/Components/Ticket/Request"
 	Response2 "golang_monolithic_bilerplate/Components/Ticket/Response"
+	"log"
 
 	"net/http"
 )
@@ -22,7 +24,13 @@ func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
 	var ticketRequest Ticket.CreateTicketRequest
 	Helper.Decode(context.Request, &ticketRequest)
 
-	//fmt.Println("before call controler", ticketRequest)
+	validationError := Validator.ValidationCheck(ticketRequest)
+	log.Println(validationError)
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+	}
+
 	ticketResponse, responseError := ticketControler.ticketService.CreateTicket(ticketRequest)
 
 	if responseError != nil {

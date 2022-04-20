@@ -19,18 +19,9 @@ func NewUserRepository() *UserRepository {
 }
 
 // CreateUser exec query for create new user in database
-func (userRepository *UserRepository) CreateUser(creatUserRequest Request.CreateUserRequest) (Entity.UserMongo, error) {
+func (userRepository *UserRepository) CreateUser(creatUserRequest Request.CreateUserRequest, password string) (Entity.UserMongo, error) {
 	user := Entity.UserMongo{}
-	password, err := Helper.HashPassword(creatUserRequest.Password)
-	if err != nil {
-		return Entity.UserMongo{}, err
-	}
-	// this is for postgres
-	//queryError := Config.DB.Get(&user, `SELECT * FROM newuser($1 , $2, 0)`, creatUserRequest.UserName, password)
 
-	if err != nil {
-		return Entity.UserMongo{}, err
-	}
 	result, err := Config.UserCollection.InsertOne(Config.DBCtx, Entity.UserMongo{ID: primitive.NewObjectID(),
 		UserName: creatUserRequest.UserName, Password: password, CreatedAt: time.Now()})
 	if err != nil {

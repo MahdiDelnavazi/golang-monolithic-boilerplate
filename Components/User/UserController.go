@@ -3,9 +3,11 @@ package Controller
 import (
 	"github.com/gin-gonic/gin"
 	"golang_monolithic_bilerplate/Common/Helper"
-	Response2 "golang_monolithic_bilerplate/Common/Response"
+	Response "golang_monolithic_bilerplate/Common/Response"
+	"golang_monolithic_bilerplate/Common/Validator"
 	"golang_monolithic_bilerplate/Components/User/Request"
-	"golang_monolithic_bilerplate/Components/User/Response"
+	UserResponse "golang_monolithic_bilerplate/Components/User/Response"
+	"log"
 	"net/http"
 )
 
@@ -21,12 +23,19 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 	var userRequest Request.CreateUserRequest
 	Helper.Decode(context.Request, &userRequest)
 
+	validationError := Validator.ValidationCheck(userRequest)
+	log.Println(validationError)
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+	}
+
 	userResponse, responseError := userControler.userService.Create(userRequest)
 
 	if responseError != nil {
 		// if username not empty means its userExist error
 		if userResponse.UserName != "" {
-			response := Response2.GeneralResponse{Error: true, Message: "user exist", Data: nil}
+			response := Response.GeneralResponse{Error: true, Message: "user exist", Data: nil}
 			context.JSON(http.StatusBadRequest, gin.H{"response": response})
 			return
 		}
@@ -37,13 +46,20 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 
 	// all ok
 	// create general response
-	response := Response2.GeneralResponse{Error: false, Message: "user have been created", Data: Response.CreateUserResponse{UserName: userResponse.UserName}}
+	response := Response.GeneralResponse{Error: false, Message: "user have been created", Data: UserResponse.CreateUserResponse{UserName: userResponse.UserName}}
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
 func (userControler *UserController) LoginUser(context *gin.Context) {
 	var userRequest Request.LoginUserRequest
 	Helper.Decode(context.Request, &userRequest)
+
+	validationError := Validator.ValidationCheck(userRequest)
+	log.Println(validationError)
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+	}
 
 	userResponse, responseError := userControler.userService.LoginUser(userRequest)
 
@@ -54,7 +70,7 @@ func (userControler *UserController) LoginUser(context *gin.Context) {
 
 	// all ok
 	// create general response
-	response := Response2.GeneralResponse{Error: false, Message: "your login is successful", Data: Response.LoginUserResponse{UserName: userResponse.UserName, AccessToken: userResponse.AccessToken, RefreshToken: userResponse.RefreshToken}}
+	response := Response.GeneralResponse{Error: false, Message: "your login is successful", Data: UserResponse.LoginUserResponse{UserName: userResponse.UserName, AccessToken: userResponse.AccessToken, RefreshToken: userResponse.RefreshToken}}
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
@@ -71,6 +87,6 @@ func (userControler *UserController) LoginUser(context *gin.Context) {
 //
 //	// all ok
 //	// create general response
-//	response1 := Response2.GeneralResponse{Error: false, Message: logoutResponse}
+//	response1 := Response.GeneralResponse{Error: false, Message: logoutResponse}
 //	context.JSON(http.StatusOK, gin.H{"response": response1})
 //}
