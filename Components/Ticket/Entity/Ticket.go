@@ -6,7 +6,6 @@ import (
 )
 
 type Ticket struct {
-	Id        uuid.UUID
 	UserId    uuid.UUID
 	Like      bool
 	Subject   string

@@ -22,6 +22,10 @@ type EnvironmentConfig struct {
 		MaxOpenConns int    `env:"DB_MAX_OPEN_CONNS" env-default:"100"`
 		DisableTLS   bool   `env:"DB_DISABLE_TLS" env-default:"false"`
 	}
+	MongoDB struct {
+		Url    string `env:"DB_URL" env-default:"mongodb://localhost:27017"`
+		DBname string `env:"DB_NAME" env-default:"golang_monolithic_boilerplate"`
+	}
 	Redis struct {
 		Host     string `env:"REDIS_HOST" env-default:"localhost:6379"`
 		Password string `env:"REDIS_PASSWORD" env-default:""`

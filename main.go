@@ -25,20 +25,21 @@ func main() {
 
 	// =====================================================
 	// Open Database Connection
-	Config.DatabaseOpen(Config.DatabaseConfig{
-		User:         config.DB.User,
-		Password:     config.DB.Password,
-		Host:         config.DB.Host,
-		Name:         config.DB.Name,
-		MaxIdleConns: config.DB.MaxIdleConns,
-		MaxOpenConns: config.DB.MaxOpenConns,
-		DisableTLS:   config.DB.DisableTLS,
-	})
+	//Config.MongoDatabaseOpen(Config.DatabaseConfig{
+	//	User:         config.DB.User,
+	//	Password:     config.DB.Password,
+	//	Host:         config.DB.Host,
+	//	Name:         config.DB.Name,
+	//	MaxIdleConns: config.DB.MaxIdleConns,
+	//	MaxOpenConns: config.DB.MaxOpenConns,
+	//	DisableTLS:   config.DB.DisableTLS,
+	//})
+	fmt.Println("this is mongo cofig :", config.MongoDB)
+	Config.MongoDatabaseOpen(Config.MongoDB{Url: config.MongoDB.Url, DBname: config.MongoDB.DBname})
 	//defer func() {
-	//	Config.PostgresDB.Close()
+	//	Config.DB.Close()
 	//	fmt.Println("database in disconnected ")
 	//}()
-	//fmt.Println("this is database2 : ", Config.PostgresDB)
 
 	// =====================================================
 	// Create new token maker

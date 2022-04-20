@@ -1,8 +1,10 @@
 package Response
 
-import "github.com/google/uuid"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type GetUserResponse struct {
-	UserId   uuid.UUID `json:"subject" validate:"required"`
-	UserName string    `json:"username" validate:"required,min=3"`
+	UserId   primitive.ObjectID `json:"subject" validate:"required"`
+	UserName string             `json:"username" validate:"required,min=3"`
 }

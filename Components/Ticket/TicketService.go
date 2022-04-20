@@ -35,5 +35,5 @@ func (ticketService TicketService) CreateTicket(createTicketRequest Ticket.Creat
 		return Response.CreateTicketResponse{}, ticketError
 	}
 	// we need a transformer
-	return Response.CreateTicketResponse{UserId: ticket.UserId, Subject: ticket.Subject, Message: ticket.Message}, nil
+	return Response.CreateTicketResponse{Subject: ticket.Subject, Message: ticket.Message, Image: ticket.Image}, nil
 }

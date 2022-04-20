@@ -32,6 +32,6 @@ func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
 
 	// all ok
 	// create general response
-	response := Response.GeneralResponse{Error: false, Message: "ticket have been created", Data: Ticket.CreateTicketRequest{UserName: ticketResponse.UserName, Message: ticketResponse.Message, Subject: ticketResponse.Subject}}
+	response := Response.GeneralResponse{Error: false, Message: "ticket have been created", Data: Response2.CreateTicketResponse{Message: ticketResponse.Message, Subject: ticketResponse.Subject, Image: ticketResponse.Image}}
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }

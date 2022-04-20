@@ -1,9 +1,7 @@
 package Router
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"golang_monolithic_bilerplate/Common/Config"
 	"golang_monolithic_bilerplate/Common/Middleware"
 	Controller3 "golang_monolithic_bilerplate/Components/Auth"
 	Controller2 "golang_monolithic_bilerplate/Components/AuthUser"
@@ -46,7 +44,7 @@ func Routes(app *gin.Engine) {
 	newAuthController := Controller3.NewAuthController()
 
 	authRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
-	fmt.Println("befor run user end point : ", Config.PostgresDB)
+
 	routerUser.POST("/create", newUserController.CreateUser)
 	routerUser.POST("/login", newUserController.LoginUser)
 	routerUser.POST("/logout", newAuthUserController.Logout)

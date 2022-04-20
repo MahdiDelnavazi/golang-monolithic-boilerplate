@@ -35,8 +35,8 @@ func (userService UserService) Create(createUserRequest Request.CreateUserReques
 		return Response.CreateUserResponse{UserName: checkUserName.UserName}, errors.New("user exist")
 	}
 
-	fmt.Println("user befor create in service : ", checkUserName, createUserRequest)
 	userResponse, userRepositoryError := userService.userRepository.CreateUser(createUserRequest)
+	fmt.Println("user befor create in service : ", userResponse)
 	if userRepositoryError != nil {
 		return Response.CreateUserResponse{}, userRepositoryError
 	}
@@ -98,5 +98,5 @@ func (userService UserService) GetUser(getUserRequest Request.GetUserRequest) (R
 		return Response.GetUserResponse{}, getUserError
 	}
 	// we need a transformer
-	return Response.GetUserResponse{UserId: user.Id, UserName: user.UserName}, nil
+	return Response.GetUserResponse{UserId: user.ID, UserName: user.UserName}, nil
 }
