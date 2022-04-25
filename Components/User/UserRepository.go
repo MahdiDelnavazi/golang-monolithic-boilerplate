@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang_monolithic_bilerplate/Common/Config"
 	"golang_monolithic_bilerplate/Common/Helper"
 	"golang_monolithic_bilerplate/Components/User/Entity"
@@ -23,7 +24,7 @@ func NewUserRepository() *UserRepository {
 func (userRepository *UserRepository) CreateUser(creatUserRequest Request.CreateUserRequest, password string) (Entity.User, error) {
 	user := Entity.User{}
 
-	result, err := Config.UserCollection.InsertOne(Config.DBCtx, Entity.User{ID: primitive.NewObjectID(),
+	result, err := Config.UserCollection.InsertOne(Config.DBCtx, Entity.User{ID: primitive.NewObjectID(), IsActive: true,
 		UserName: creatUserRequest.UserName, Password: password, CreatedAt: time.Now()})
 	if err != nil {
 		return Entity.User{}, err
@@ -74,11 +75,71 @@ func (usserRepository UserRepository) GetUserByUsername(username string) (Entity
 	return user, queryError
 }
 
+func (usserRepository UserRepository) GetUserById(id string) (Entity.User, error) {
+	var user Entity.User
+
+	id1, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return Entity.User{}, fmt.Errorf("id is not valid")
+	}
+
+	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
+	if queryError != nil {
+		return Entity.User{}, fmt.Errorf("user not found")
+	}
+	return user, queryError
+}
+
+func (usserRepository UserRepository) UpdateUser(request Request.UpdateUserRequest) (Entity.User, error) {
+	var user Entity.User
+
+	id1, err := primitive.ObjectIDFromHex(request.ID)
+	if err != nil {
+		return Entity.User{}, fmt.Errorf("id is not valid")
+	}
+	update := bson.D{
+		{"$set", bson.D{{"UserName", request.UserName}, {"Active", request.Active}, {"UpdatedAt", time.Now()}}},
+	}
+	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	fmt.Println("update result ", result)
+	if result != nil {
+		return Entity.User{}, fmt.Errorf("user not found")
+	}
+	return user, result
+}
+
+func (usserRepository UserRepository) ChangePassword(request Request.ChangePasswordRequest) (string, error) {
+	var user Entity.User
+
+	id1, err := primitive.ObjectIDFromHex(request.ID)
+	if err != nil {
+		return "", fmt.Errorf("id is not valid")
+	}
+
+	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
+	if queryError != nil {
+		return "", fmt.Errorf("user not found")
+	}
+	isPasswordOk := Helper.CheckPasswordHash(request.CurrentPassword, user.Password)
+	if !isPasswordOk {
+		return "", fmt.Errorf("user not found")
+	}
+
+	hashedPassword, _ := Helper.HashPassword(request.NewPassword)
+	update := bson.D{
+		{"$set", bson.D{{"Password", hashedPassword}, {"UpdatedAt", time.Now()}}},
+	}
+	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	if result != nil {
+		return "", fmt.Errorf("user not found")
+	}
+	return "password is changed", nil
+}
+
 func (userRepository UserRepository) GetAllUsers(page int, limit int) ([]Entity.User, error) {
 	var userList = make([]Entity.User, 0)
 
 	userCursor, queryError := Config.UserCollection.Find(Config.DBCtx, bson.M{}, Helper.NewMongoPaginate(limit, page).GetPaginatedOpts())
-	log.Println("query error : ", userCursor.Err())
 	if queryError != nil {
 		return nil, queryError
 	}
@@ -93,4 +154,29 @@ func (userRepository UserRepository) GetAllUsers(page int, limit int) ([]Entity.
 	}
 
 	return userList, queryError
+}
+
+func (userRepository UserRepository) ChangeActiveStatus(id string) (Entity.User, error) {
+	var user Entity.User
+
+	id1, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return Entity.User{}, fmt.Errorf("id is not valid")
+	}
+
+	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
+	if queryError != nil {
+		return Entity.User{}, fmt.Errorf("user not found")
+	}
+
+	update := bson.D{
+		{"$set", bson.D{{"IsActive", !user.IsActive}, {"UpdatedAt", time.Now()}}},
+	}
+	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	if result != nil {
+		return Entity.User{}, fmt.Errorf("user not found")
+	}
+
+	return user, queryError
+
 }

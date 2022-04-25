@@ -8,15 +8,10 @@ import (
 type User struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	UserName  string             `bson:"UserName"`
-	Password  string             `bson:"Password""`
-	Active    bool               `bson:"Active"`
+	Password  string             `bson:"Password"`
+	IsActive  bool               `bson:"IsActive" `
+	Role      string             `bson:"Role"`
 	CreatedAt time.Time          `bson:"CreatedAt"`
 	UpdatedAt *time.Time         `bson:"UpdatedAt"`
 	DeletedAt *time.Time         `bson:"DeletedAt"`
 }
-
-//func SetUser(user User) {
-//	if user.UpdatedAt != nil {
-//		user.UpdatedAt = time.Time{}
-//	}
-//}

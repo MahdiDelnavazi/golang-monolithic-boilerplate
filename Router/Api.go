@@ -44,14 +44,26 @@ func Routes(app *gin.Engine) {
 	newAuthService := Controller3.NewAuthService()
 	newAuthController := Controller3.NewAuthController(newAuthService)
 
+	// implement middleware to routes
 	authTicketRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
 	authUserRoutes := routerUser.Group("/").Use(Middleware.AuthMiddleware())
 
+	// user endpoints without auth
 	routerUser.POST("/create", newUserController.CreateUser)
 	routerUser.POST("/login", newUserController.LoginUser)
 	routerUser.POST("/logout", newAuthUserController.Logout)
+
+	// user endpoints with auth
+	authUserRoutes.GET("/get_all", newUserController.GetAllUsers)
+	authUserRoutes.GET("/", newUserController.GetUserById)
+	authUserRoutes.PATCH("/", newUserController.UpdateUser)
+	authUserRoutes.PATCH("/change_password", newUserController.ChangePassword)
+	authUserRoutes.PATCH("/change_status", newUserController.ChangeActiveStatus)
+
+	// authUser endpoints
 	authUser.POST("/newToken", newAuthController.AccessToken)
+
+	// ticket endpoints with auth
 	authTicketRoutes.POST("/create", newTicketController.CreateTicket)
-	authUserRoutes.POST("/getAll", newUserController.GetAllUsers)
 
 }

@@ -1,11 +1,10 @@
 package Controller
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"golang_monolithic_bilerplate/Common/Helper"
 	Response "golang_monolithic_bilerplate/Common/Response"
 	"golang_monolithic_bilerplate/Common/Validator"
+	Response2 "golang_monolithic_bilerplate/Components/Ticket/Response"
 	"golang_monolithic_bilerplate/Components/User/Request"
 	UserResponse "golang_monolithic_bilerplate/Components/User/Response"
 	"log"
@@ -22,13 +21,15 @@ func NewUserController(userService *UserService) *UserController {
 
 func (userControler *UserController) CreateUser(context *gin.Context) {
 	var userRequest Request.CreateUserRequest
-	Helper.Decode(context.Request, &userRequest)
+
+	context.ShouldBindJSON(&userRequest)
 
 	validationError := Validator.ValidationCheck(userRequest)
 	log.Println(validationError)
 	if validationError != nil {
 		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
 		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
 	}
 
 	userResponse, responseError := userControler.userService.Create(userRequest)
@@ -41,7 +42,7 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 			return
 		}
 		// if username is empty means its validation error
-		context.JSON(http.StatusBadRequest, gin.H{"response": responseError})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
@@ -51,45 +52,143 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
+// LoginUser for get access token
 func (userControler *UserController) LoginUser(context *gin.Context) {
 	var userRequest Request.LoginUserRequest
-	Helper.Decode(context.Request, &userRequest)
+	context.ShouldBindJSON(&userRequest)
 
 	validationError := Validator.ValidationCheck(userRequest)
 	log.Println(validationError)
 	if validationError != nil {
 		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
 		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
 	}
 
 	userResponse, responseError := userControler.userService.LoginUser(userRequest)
 
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": responseError})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
 	// all ok
 	// create general response
-	response := Response.GeneralResponse{Error: false, Message: "your login is successful", Data: UserResponse.LoginUserResponse{UserName: userResponse.UserName, AccessToken: userResponse.AccessToken, RefreshToken: userResponse.RefreshToken}}
+	response := Response.GeneralResponse{Error: false, Message: "your login is successful", Data: userResponse}
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
+// GetAllUsers return all users with pagination
 func (userController *UserController) GetAllUsers(context *gin.Context) {
 	var userRequest Request.GetAllUsers
-	Helper.Decode(context.Request, &userRequest)
+	context.ShouldBindQuery(&userRequest)
 
 	validationError := Validator.ValidationCheck(userRequest)
-	log.Println(validationError)
+
 	if validationError != nil {
 		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
 		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
 	}
 
-	fmt.Println("user req ", userRequest)
 	result, responseError := userController.userService.GetAllUsers(userRequest.Page, userRequest.Limit)
 	if responseError != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"response": responseError})
+		return
+	}
+
+	response := Response.GeneralResponse{Error: false, Message: "successful", Data: result}
+	context.JSON(http.StatusOK, gin.H{"response": response})
+}
+
+// GetUserById return user with id
+func (userController *UserController) GetUserById(context *gin.Context) {
+	var userRequest Request.GetUser
+
+	context.ShouldBindQuery(&userRequest)
+
+	validationError := Validator.ValidationCheck(userRequest)
+
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	result, responseError := userController.userService.GetUserById(userRequest)
+	if responseError != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		return
+	}
+
+	response := Response.GeneralResponse{Error: false, Message: "successful", Data: result}
+	context.JSON(http.StatusOK, gin.H{"response": response})
+}
+
+// UpdateUser for update user with any params that client sends
+func (userController *UserController) UpdateUser(context *gin.Context) {
+	var userRequest Request.UpdateUserRequest
+	context.ShouldBindJSON(&userRequest)
+	context.ShouldBindQuery(&userRequest)
+
+	validationError := Validator.ValidationCheck(userRequest)
+
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	result, responseError := userController.userService.UpdateUser(userRequest)
+	if responseError != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		return
+	}
+
+	response := Response.GeneralResponse{Error: false, Message: "successful", Data: result}
+	context.JSON(http.StatusOK, gin.H{"response": response})
+}
+
+// ChangeActiveStatus for changing active and deactivate user
+func (userController *UserController) ChangeActiveStatus(context *gin.Context) {
+	var userRequest Request.ChangeStatusRequest
+	context.ShouldBindQuery(&userRequest)
+
+	validationError := Validator.ValidationCheck(userRequest)
+
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	result, responseError := userController.userService.ChangeActiveStatus(userRequest)
+	if responseError != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		return
+	}
+
+	response := Response.GeneralResponse{Error: false, Message: "successful", Data: result}
+	context.JSON(http.StatusOK, gin.H{"response": response})
+}
+
+func (userController *UserController) ChangePassword(context *gin.Context) {
+	var userRequest Request.ChangePasswordRequest
+	//Helper.Decode(context.Request, &userRequest)
+	context.ShouldBindJSON(&userRequest)
+	context.ShouldBindQuery(&userRequest)
+
+	validationError := Validator.ValidationCheck(userRequest)
+
+	if validationError != nil {
+		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	result, responseError := userController.userService.ChangePassword(userRequest)
+	if responseError != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 

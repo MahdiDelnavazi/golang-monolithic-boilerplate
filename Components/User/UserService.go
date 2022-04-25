@@ -4,6 +4,7 @@ import (
 	"errors"
 	"golang_monolithic_bilerplate/Common/Helper"
 	token "golang_monolithic_bilerplate/Common/Token"
+	"golang_monolithic_bilerplate/Components/User/Entity"
 	"golang_monolithic_bilerplate/Components/User/Request"
 	"golang_monolithic_bilerplate/Components/User/Response"
 
@@ -54,8 +55,9 @@ func (userService UserService) LoginUser(loginUserRequest Request.LoginUserReque
 	if errRefreshToken != nil {
 		return Response.LoginUserResponse{}, err
 	}
+
 	// we need a transformer
-	return Response.LoginUserResponse{UserName: user.UserName, AccessToken: accessToken, RefreshToken: refreshToken}, nil
+	return Response.LoginUserResponse{UserName: user.UserName, AccessToken: accessToken, RefreshToken: refreshToken, ID: user.ID.Hex()}, nil
 }
 
 func (userService UserService) GetUser(getUserRequest Request.GetUserRequest) (Response.GetUserResponse, error) {
@@ -65,6 +67,43 @@ func (userService UserService) GetUser(getUserRequest Request.GetUserRequest) (R
 	}
 	// we need a transformer
 	return Response.GetUserResponse{UserId: user.ID, UserName: user.UserName}, nil
+}
+
+func (userService UserService) GetUserById(getUserRequest Request.GetUser) (Entity.User, error) {
+	user, getUserError := userService.userRepository.GetUserById(getUserRequest.ID)
+	if getUserError != nil {
+		return Entity.User{}, getUserError
+	}
+
+	return user, nil
+}
+
+func (userService UserService) UpdateUser(request Request.UpdateUserRequest) (Entity.User, error) {
+
+	user, getUserError := userService.userRepository.UpdateUser(request)
+	if getUserError != nil {
+		return Entity.User{}, getUserError
+	}
+
+	return user, nil
+}
+
+func (userService UserService) ChangePassword(request Request.ChangePasswordRequest) (string, error) {
+	message, getUserError := userService.userRepository.ChangePassword(request)
+	if getUserError != nil {
+		return "", getUserError
+	}
+
+	return message, nil
+}
+
+func (userService UserService) ChangeActiveStatus(request Request.ChangeStatusRequest) (Entity.User, error) {
+	user, getUserError := userService.userRepository.ChangeActiveStatus(request.ID)
+	if getUserError != nil {
+		return Entity.User{}, getUserError
+	}
+
+	return user, nil
 }
 
 func (userService UserService) GetAllUsers(page int, limit int) (Response.ResponseAllUsers, error) {

@@ -1,7 +1,8 @@
 package Response
 
 type LoginUserResponse struct {
-	UserName     string `json:"username" validate:"required,min=3"`
-	AccessToken  string `json:"accessToken" binding:"required"`
-	RefreshToken string `json:"refreshToken" binding:"required"`
+	UserName     string `json:"username" `
+	ID           string `json:"id" `
+	AccessToken  string `json:"accessToken" `
+	RefreshToken string `json:"refreshToken" `
 }
