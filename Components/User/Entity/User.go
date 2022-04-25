@@ -10,7 +10,7 @@ type User struct {
 	UserName  string             `bson:"UserName"`
 	Password  string             `bson:"Password"`
 	IsActive  bool               `bson:"IsActive" `
-	Role      string             `bson:"Role"`
+	RoleID    int                `bson:"RoleID"`
 	CreatedAt time.Time          `bson:"CreatedAt"`
 	UpdatedAt *time.Time         `bson:"UpdatedAt"`
 	DeletedAt *time.Time         `bson:"DeletedAt"`

@@ -84,6 +84,9 @@ func MongoDatabaseOpen(cfg MongoDB) {
 	ping(client, ctx)
 	UserCollection = DBMongo.Collection("User")
 	TicketCollection = DBMongo.Collection("Ticket")
+	TicketCollection = DBMongo.Collection("Role")
+	TicketCollection = DBMongo.Collection("Permission")
+	TicketCollection = DBMongo.Collection("RolePermission")
 }
 
 func connect(uri string) (*mongo.Client, context.Context,
