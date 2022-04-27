@@ -2,11 +2,12 @@ package Ticket
 
 import (
 	"github.com/gin-gonic/gin"
-	"golang_monolithic_bilerplate/Common/Helper"
-	"golang_monolithic_bilerplate/Common/Response"
-	"golang_monolithic_bilerplate/Common/Validator"
-	Ticket "golang_monolithic_bilerplate/Components/Ticket/Request"
-	Response2 "golang_monolithic_bilerplate/Components/Ticket/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Helper"
+	General "github.com/mahdidl/golang_boilerplate/Common/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Validator"
+	Ticket "github.com/mahdidl/golang_boilerplate/Components/Ticket/Request"
+	Response "github.com/mahdidl/golang_boilerplate/Components/Ticket/Response"
+
 	"log"
 
 	"net/http"
@@ -27,19 +28,19 @@ func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
 	validationError := Validator.ValidationCheck(ticketRequest)
 	log.Println(validationError)
 	if validationError != nil {
-		response := Response.GeneralResponse{Error: true, Message: validationError.Error()}
+		response := General.GeneralResponse{Error: true, Message: validationError.Error()}
 		context.JSON(http.StatusBadRequest, gin.H{"response": response})
 	}
 
 	ticketResponse, responseError := ticketControler.ticketService.CreateTicket(ticketRequest)
 
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
 	// all ok
 	// create general response
-	response := Response.GeneralResponse{Error: false, Message: "ticket have been created", Data: Response2.CreateTicketResponse{Message: ticketResponse.Message, Subject: ticketResponse.Subject, Image: ticketResponse.Image}}
+	response := General.GeneralResponse{Error: false, Message: "ticket have been created", Data: Response.CreateTicketResponse{Message: ticketResponse.Message, Subject: ticketResponse.Subject, Image: ticketResponse.Image}}
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }

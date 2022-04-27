@@ -1,8 +1,8 @@
 package Controller
 
 import (
-	token "golang_monolithic_bilerplate/Common/Token"
-	User2 "golang_monolithic_bilerplate/Components/Auth/Request"
+	token "github.com/mahdidl/golang_boilerplate/Common/Token"
+	User "github.com/mahdidl/golang_boilerplate/Components/Auth/Request"
 	"time"
 )
 
@@ -13,14 +13,16 @@ func NewAuthService() *AuthService {
 	return &AuthService{}
 }
 
-func (authUserService AuthService) CreateAccessToken(accessTokenReq User2.AccessTokenRequest) (response string, err error) {
+func (authUserService AuthService) CreateAccessToken(accessTokenReq User.AccessTokenRequest) (response string, err error) {
 
 	//todo: move to service
 	payload, err := token.MakerPaseto.VerifyToken(accessTokenReq.AccessToken)
 	if err != nil {
 		return "", err
 	}
-	newToken, err := token.MakerPaseto.CreateToken(payload.Username, time.Hour)
+
+	// todo: change token duration
+	newToken, err := token.MakerPaseto.CreateToken(payload.Username, time.Hour*10000)
 	if err != nil {
 		return "", err
 	}

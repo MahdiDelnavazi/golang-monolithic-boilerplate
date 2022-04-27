@@ -2,13 +2,14 @@ package Controller
 
 import (
 	"fmt"
+	"github.com/mahdidl/golang_boilerplate/Common/Config"
+	"github.com/mahdidl/golang_boilerplate/Common/Helper"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Entity"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang_monolithic_bilerplate/Common/Config"
-	"golang_monolithic_bilerplate/Common/Helper"
-	"golang_monolithic_bilerplate/Components/User/Entity"
-	"golang_monolithic_bilerplate/Components/User/Request"
+
 	"log"
 	"time"
 )

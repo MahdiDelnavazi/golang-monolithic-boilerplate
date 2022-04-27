@@ -3,8 +3,10 @@ package Middleware
 import (
 	"errors"
 	"fmt"
-	"golang_monolithic_bilerplate/Common/Config"
-	token "golang_monolithic_bilerplate/Common/Token"
+	token "github.com/mahdidl/golang_boilerplate/Common/Token"
+
+	"github.com/mahdidl/golang_boilerplate/Common/Config"
+
 	"net/http"
 	"strings"
 

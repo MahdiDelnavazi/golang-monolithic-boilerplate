@@ -1,11 +1,11 @@
-package Entity
+package Response
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
-type Role struct {
+type Attach struct {
 	Id            primitive.ObjectID   `bson:"_id"`
 	PermissionsId []primitive.ObjectID `bson:"Permissions"`
 	Name          string               `bson:"Name"`

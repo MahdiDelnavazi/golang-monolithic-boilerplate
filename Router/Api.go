@@ -2,11 +2,15 @@ package Router
 
 import (
 	"github.com/gin-gonic/gin"
-	"golang_monolithic_bilerplate/Common/Middleware"
-	Controller3 "golang_monolithic_bilerplate/Components/Auth"
-	Controller2 "golang_monolithic_bilerplate/Components/AuthUser"
-	"golang_monolithic_bilerplate/Components/Ticket"
-	Controller "golang_monolithic_bilerplate/Components/User"
+	"github.com/mahdidl/golang_boilerplate/Common/Middleware"
+	Auth "github.com/mahdidl/golang_boilerplate/Components/Auth"
+	AuthUser "github.com/mahdidl/golang_boilerplate/Components/AuthUser"
+	"github.com/mahdidl/golang_boilerplate/Components/Permission"
+	"github.com/mahdidl/golang_boilerplate/Components/Role"
+	RolePermission "github.com/mahdidl/golang_boilerplate/Components/RolePermission"
+	"github.com/mahdidl/golang_boilerplate/Components/Ticket"
+	User "github.com/mahdidl/golang_boilerplate/Components/User"
+
 	"net/http"
 )
 
@@ -15,6 +19,9 @@ const (
 	userPrefix           = "/user"
 	ticketPrefix         = "/ticket"
 	authenticationPrefix = "/auth"
+	permissionPrefix     = "/permission"
+	rolePrefix           = "/role"
+	rolePermissionPrefix = "/role_permission"
 )
 
 func Routes(app *gin.Engine) {
@@ -22,6 +29,9 @@ func Routes(app *gin.Engine) {
 	routerTicket := app.Group(prefix + ticketPrefix)
 	routerUser := app.Group(prefix + userPrefix)
 	authUser := app.Group(prefix + authenticationPrefix)
+	authPermission := app.Group(prefix + permissionPrefix)
+	authRole := app.Group(prefix + rolePrefix)
+	RolePermissionRouter := app.Group(prefix + rolePermissionPrefix)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -29,24 +39,39 @@ func Routes(app *gin.Engine) {
 		})
 	})
 
-	newUserRepository := Controller.NewUserRepository()
-	newUserService := Controller.NewUserService(newUserRepository)
-	newUserController := Controller.NewUserController(newUserService)
+	newUserRepository := User.NewUserRepository()
+	newUserService := User.NewUserService(newUserRepository)
+	newUserController := User.NewUserController(newUserService)
 
-	newAuthUserRepository := Controller2.NewAuthUserRepository()
-	newAuthUserService := Controller2.NewAuthUserService(newAuthUserRepository)
-	newAuthUserController := Controller2.NewAuthUserController(newAuthUserService)
+	newAuthUserRepository := AuthUser.NewAuthUserRepository()
+	newAuthUserService := AuthUser.NewAuthUserService(newAuthUserRepository)
+	newAuthUserController := AuthUser.NewAuthUserController(newAuthUserService)
 
 	newTicketRepository := Ticket.NewTicketRepository()
 	newTicketService := Ticket.NewTicketService(newUserService, newTicketRepository)
 	newTicketController := Ticket.NewTicketController(newTicketService)
 
-	newAuthService := Controller3.NewAuthService()
-	newAuthController := Controller3.NewAuthController(newAuthService)
+	newAuthService := Auth.NewAuthService()
+	newAuthController := Auth.NewAuthController(newAuthService)
+
+	newPermissionRepository := Permission.NewPermissionRepository()
+	newPermissionService := Permission.NewPermissionService(newPermissionRepository)
+	newPermissionController := Permission.NewPermissionController(newPermissionService)
+
+	newRoleRepository := Role.NewRoleRepository()
+	newRoleService := Role.NewPermissionService(newRoleRepository)
+	newRoleController := Role.NewRoleController(newRoleService)
+
+	newRolePermissionRepository := RolePermission.NewRolePermissionRepository()
+	newRolePermissionService := RolePermission.NewRolePermissionService(newRolePermissionRepository)
+	newRolePermissionController := RolePermission.NewRolePermissionController(newRolePermissionService)
 
 	// implement middleware to routes
 	authTicketRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
 	authUserRoutes := routerUser.Group("/").Use(Middleware.AuthMiddleware())
+	authPermissionRoutes := authPermission.Group("/").Use(Middleware.AuthMiddleware())
+	authRoleRoutes := authRole.Group("/").Use(Middleware.AuthMiddleware())
+	RolePermissionRoutes := RolePermissionRouter.Group("/").Use(Middleware.AuthMiddleware())
 
 	// user endpoints without auth
 	routerUser.POST("/create", newUserController.CreateUser)
@@ -65,5 +90,19 @@ func Routes(app *gin.Engine) {
 
 	// ticket endpoints with auth
 	authTicketRoutes.POST("/create", newTicketController.CreateTicket)
+
+	// permission endpoints with auth
+	// todo: remove create permission
+	authPermissionRoutes.POST("/create", newPermissionController.CreatePermission)
+	authPermissionRoutes.GET("/", newPermissionController.GetPermissions)
+
+	// role endpoint with auth
+	authRoleRoutes.POST("/create", newRoleController.CreateRole)
+	authRoleRoutes.GET("/get_all", newRoleController.GetAllRoles)
+	authRoleRoutes.GET("/", newRoleController.GetRole)
+	authRoleRoutes.PATCH("/", newRoleController.UpdateRole)
+	authRoleRoutes.DELETE("/", newRoleController.DeleteRole)
+
+	RolePermissionRoutes.PATCH("/attach", newRolePermissionController.Attach)
 
 }

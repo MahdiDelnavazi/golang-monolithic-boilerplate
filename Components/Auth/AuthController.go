@@ -2,11 +2,12 @@ package Controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"golang_monolithic_bilerplate/Common/Helper"
-	"golang_monolithic_bilerplate/Common/Response"
-	"golang_monolithic_bilerplate/Common/Validator"
-	User "golang_monolithic_bilerplate/Components/Auth/Request"
-	Response2 "golang_monolithic_bilerplate/Components/Auth/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Helper"
+	"github.com/mahdidl/golang_boilerplate/Common/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Validator"
+	User "github.com/mahdidl/golang_boilerplate/Components/Auth/Request"
+	Response2 "github.com/mahdidl/golang_boilerplate/Components/Auth/Response"
+
 	"log"
 
 	"net/http"

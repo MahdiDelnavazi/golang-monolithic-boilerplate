@@ -1,6 +1,6 @@
 package Response
 
-import "golang_monolithic_bilerplate/Components/User/Entity"
+import "github.com/mahdidl/golang_boilerplate/Components/User/Entity"
 
 type ResponseAllUsers struct {
 	Users []Entity.User `json:"users" `

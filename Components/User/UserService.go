@@ -2,11 +2,11 @@ package Controller
 
 import (
 	"errors"
-	"golang_monolithic_bilerplate/Common/Helper"
-	token "golang_monolithic_bilerplate/Common/Token"
-	"golang_monolithic_bilerplate/Components/User/Entity"
-	"golang_monolithic_bilerplate/Components/User/Request"
-	"golang_monolithic_bilerplate/Components/User/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Helper"
+	token "github.com/mahdidl/golang_boilerplate/Common/Token"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Entity"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Response"
 
 	"time"
 )
@@ -46,7 +46,7 @@ func (userService UserService) LoginUser(loginUserRequest Request.LoginUserReque
 	}
 
 	//create new token for login
-	accessToken, err := token.MakerPaseto.CreateToken(loginUserRequest.UserName, time.Hour)
+	accessToken, err := token.MakerPaseto.CreateToken(loginUserRequest.UserName, time.Hour*10000)
 	if err != nil {
 		return Response.LoginUserResponse{}, err
 	}

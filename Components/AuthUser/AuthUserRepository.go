@@ -1,9 +1,9 @@
 package Controller
 
 import (
-	"golang_monolithic_bilerplate/Common/Config"
-	token "golang_monolithic_bilerplate/Common/Token"
-	User "golang_monolithic_bilerplate/Components/AuthUser/Request"
+	"github.com/mahdidl/golang_boilerplate/Common/Config"
+	token "github.com/mahdidl/golang_boilerplate/Common/Token"
+	User "github.com/mahdidl/golang_boilerplate/Components/AuthUser/Request"
 )
 
 type AuthUserRepository struct {

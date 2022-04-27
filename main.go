@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
-	"golang_monolithic_bilerplate/Common/Config"
-	token "golang_monolithic_bilerplate/Common/Token"
-	"golang_monolithic_bilerplate/Router"
+	"github.com/mahdidl/golang_boilerplate/Common/Config"
+	token "github.com/mahdidl/golang_boilerplate/Common/Token"
+	"github.com/mahdidl/golang_boilerplate/Router"
 )
 
 func main() {

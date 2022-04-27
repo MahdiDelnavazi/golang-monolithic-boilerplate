@@ -35,9 +35,12 @@ var DBPostgres *sqlx.DB
 var err error
 
 var (
-	UserCollection   *mongo.Collection
-	TicketCollection *mongo.Collection
-	DBCtx            = context.TODO()
+	UserCollection           *mongo.Collection
+	TicketCollection         *mongo.Collection
+	RoleCollection           *mongo.Collection
+	PermissionCollection     *mongo.Collection
+	RolePermissionCollection *mongo.Collection
+	DBCtx                    = context.TODO()
 )
 
 // DatabaseOpen Open knows how to open a database connection based on the configuration.
@@ -84,9 +87,9 @@ func MongoDatabaseOpen(cfg MongoDB) {
 	ping(client, ctx)
 	UserCollection = DBMongo.Collection("User")
 	TicketCollection = DBMongo.Collection("Ticket")
-	TicketCollection = DBMongo.Collection("Role")
-	TicketCollection = DBMongo.Collection("Permission")
-	TicketCollection = DBMongo.Collection("RolePermission")
+	RoleCollection = DBMongo.Collection("Role")
+	PermissionCollection = DBMongo.Collection("Permission")
+	RolePermissionCollection = DBMongo.Collection("RolePermission")
 }
 
 func connect(uri string) (*mongo.Client, context.Context,

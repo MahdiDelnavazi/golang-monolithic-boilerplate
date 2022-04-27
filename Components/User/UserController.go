@@ -2,11 +2,12 @@ package Controller
 
 import (
 	"github.com/gin-gonic/gin"
-	Response "golang_monolithic_bilerplate/Common/Response"
-	"golang_monolithic_bilerplate/Common/Validator"
-	Response2 "golang_monolithic_bilerplate/Components/Ticket/Response"
-	"golang_monolithic_bilerplate/Components/User/Request"
-	UserResponse "golang_monolithic_bilerplate/Components/User/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Response"
+	"github.com/mahdidl/golang_boilerplate/Common/Validator"
+	Response2 "github.com/mahdidl/golang_boilerplate/Components/Ticket/Response"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
+	Response3 "github.com/mahdidl/golang_boilerplate/Components/User/Response"
+
 	"log"
 	"net/http"
 )
@@ -48,7 +49,7 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 
 	// all ok
 	// create general response
-	response := Response.GeneralResponse{Error: false, Message: "user have been created", Data: UserResponse.CreateUserResponse{UserName: userResponse.UserName}}
+	response := Response.GeneralResponse{Error: false, Message: "user have been created", Data: Response3.CreateUserResponse{UserName: userResponse.UserName}}
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 

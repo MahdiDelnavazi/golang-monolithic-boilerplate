@@ -5,6 +5,6 @@ import (
 )
 
 type Permission struct {
-	ID   primitive.ObjectID `bson:"_id"`
-	Name int                `bson:"Name"`
+	Id   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"Name"`
 }

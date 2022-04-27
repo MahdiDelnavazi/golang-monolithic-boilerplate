@@ -1,11 +1,11 @@
 package Ticket
 
 import (
-	"golang_monolithic_bilerplate/Common/Validator"
-	Ticket "golang_monolithic_bilerplate/Components/Ticket/Request"
-	"golang_monolithic_bilerplate/Components/Ticket/Response"
-	Controller "golang_monolithic_bilerplate/Components/User"
-	"golang_monolithic_bilerplate/Components/User/Request"
+	"github.com/mahdidl/golang_boilerplate/Common/Validator"
+	Ticket "github.com/mahdidl/golang_boilerplate/Components/Ticket/Request"
+	"github.com/mahdidl/golang_boilerplate/Components/Ticket/Response"
+	Controller "github.com/mahdidl/golang_boilerplate/Components/User"
+	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
 )
 
 type TicketService struct {

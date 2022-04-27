@@ -4,7 +4,7 @@ import (
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	"golang_monolithic_bilerplate/Common/Exeption"
+	"github.com/mahdidl/golang_boilerplate/Common/Exeption"
 	"reflect"
 	"strings"
 )
@@ -76,7 +76,7 @@ func GenerateID() string {
 // CheckID validates that the format of an id is valid.
 func CheckID(id string) error {
 	if _, err := uuid.Parse(id); err != nil {
-		return errors.New("ID is not in its proper form")
+		return errors.New("Id is not in its proper form")
 	}
 	return nil
 }
