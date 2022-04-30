@@ -105,16 +105,27 @@ func Routes(app *gin.Engine) {
 	authPermissionRoutes.GET("/", newPermissionController.GetPermissions)
 
 	// role endpoint with auth
+	// create role
 	authRoleRoutes.POST("/create", newRoleController.CreateRole)
+	// get all roles
 	authRoleRoutes.GET("/get_all", newRoleController.GetAllRoles)
+	// get role with id
 	authRoleRoutes.GET("/", newRoleController.GetRole)
+	// update role with id
 	authRoleRoutes.PATCH("/", newRoleController.UpdateRole)
+	// delete role with id
 	authRoleRoutes.DELETE("/", newRoleController.DeleteRole)
 
+	// attach permission to role with roleId and permissionId
 	RolePermissionRoutes.PATCH("/attach", newRolePermissionController.Attach)
+
+	// detach permission from role with roleId and permissionId
 	RolePermissionRoutes.PATCH("/detach", newRolePermissionController.Detach)
 
+	// attach role to user with roleId and userId
 	UserRoleRoutes.PATCH("/attach", newUserRoleController.Attach)
+
+	// detach role from user with userId
 	UserRoleRoutes.PATCH("/detach", newUserRoleController.Detach)
 
 }
