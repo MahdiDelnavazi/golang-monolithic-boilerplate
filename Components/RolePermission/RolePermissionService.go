@@ -21,3 +21,12 @@ func (rolePermissionService RolePermissionService) Attach(request Request.Attach
 
 	return role, nil
 }
+
+func (rolePermissionService RolePermissionService) Detach(request Request.DetachPermission) (Entity.Role, error) {
+	role, err := rolePermissionService.RolePermissionRepository.Detach(request)
+	if err != nil {
+		return Entity.Role{}, err
+	}
+
+	return role, nil
+}

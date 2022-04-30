@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type User struct {
+type UserRole struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	UserName  string             `bson:"UserName"`
 	Password  string             `bson:"Password"`

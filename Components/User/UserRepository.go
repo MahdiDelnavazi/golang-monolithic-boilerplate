@@ -99,7 +99,7 @@ func (usserRepository UserRepository) UpdateUser(request Request.UpdateUserReque
 		return Entity.User{}, fmt.Errorf("id is not valid")
 	}
 	update := bson.D{
-		{"$set", bson.D{{"UserName", request.UserName}, {"Active", request.Active}, {"UpdatedAt", time.Now()}}},
+		{"$set", bson.D{{"UserName", request.UserName}, {"Active", request.Active}, {"RoleId", nil}, {"UpdatedAt", time.Now()}}},
 	}
 	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	fmt.Println("update result ", result)

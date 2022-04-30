@@ -10,6 +10,7 @@ import (
 	RolePermission "github.com/mahdidl/golang_boilerplate/Components/RolePermission"
 	"github.com/mahdidl/golang_boilerplate/Components/Ticket"
 	User "github.com/mahdidl/golang_boilerplate/Components/User"
+	"github.com/mahdidl/golang_boilerplate/Components/UserRole"
 
 	"net/http"
 )
@@ -22,6 +23,7 @@ const (
 	permissionPrefix     = "/permission"
 	rolePrefix           = "/role"
 	rolePermissionPrefix = "/role_permission"
+	userRolePrefix       = "/user_role"
 )
 
 func Routes(app *gin.Engine) {
@@ -32,6 +34,7 @@ func Routes(app *gin.Engine) {
 	authPermission := app.Group(prefix + permissionPrefix)
 	authRole := app.Group(prefix + rolePrefix)
 	RolePermissionRouter := app.Group(prefix + rolePermissionPrefix)
+	UserRoleRouter := app.Group(prefix + userRolePrefix)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -66,12 +69,17 @@ func Routes(app *gin.Engine) {
 	newRolePermissionService := RolePermission.NewRolePermissionService(newRolePermissionRepository)
 	newRolePermissionController := RolePermission.NewRolePermissionController(newRolePermissionService)
 
+	newUserRoleRepository := UserRole.NewUserRoleRepository()
+	newUserRoleService := UserRole.NewUserRoleService(newUserRoleRepository)
+	newUserRoleController := UserRole.NewUserRoleController(newUserRoleService)
+
 	// implement middleware to routes
 	authTicketRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
 	authUserRoutes := routerUser.Group("/").Use(Middleware.AuthMiddleware())
 	authPermissionRoutes := authPermission.Group("/").Use(Middleware.AuthMiddleware())
 	authRoleRoutes := authRole.Group("/").Use(Middleware.AuthMiddleware())
 	RolePermissionRoutes := RolePermissionRouter.Group("/").Use(Middleware.AuthMiddleware())
+	UserRoleRoutes := UserRoleRouter.Group("/").Use(Middleware.AuthMiddleware())
 
 	// user endpoints without auth
 	routerUser.POST("/create", newUserController.CreateUser)
@@ -104,5 +112,9 @@ func Routes(app *gin.Engine) {
 	authRoleRoutes.DELETE("/", newRoleController.DeleteRole)
 
 	RolePermissionRoutes.PATCH("/attach", newRolePermissionController.Attach)
+	RolePermissionRoutes.PATCH("/detach", newRolePermissionController.Detach)
+
+	UserRoleRoutes.PATCH("/attach", newUserRoleController.Attach)
+	UserRoleRoutes.PATCH("/detach", newUserRoleController.Detach)
 
 }
