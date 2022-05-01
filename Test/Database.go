@@ -3,13 +3,11 @@ package Test
 import (
 	"context"
 	"fmt"
-	"github.com/go-redis/redis"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/mahdidl/golang_boilerplate/Common/Config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"log"
 	"time"
 )
 
@@ -24,18 +22,6 @@ type MongoDBTest struct {
 	DBname string `env:"DB_NAME_TEST" env-default:"golang_monolithic_boilerplate_test"`
 }
 
-var (
-	Redis                    *redis.Client
-	DBMongoTest              *mongo.Database
-	UserCollection           *mongo.Collection
-	TicketCollection         *mongo.Collection
-	RoleCollection           *mongo.Collection
-	PermissionCollection     *mongo.Collection
-	RolePermissionCollection *mongo.Collection
-
-	DBCtx = context.TODO()
-)
-
 func OpenTestingDatabase() {
 	config := MongoDBTest{}
 
@@ -49,7 +35,7 @@ func OpenTestingDatabase() {
 		panic(err)
 	}
 
-	DBMongoTest = client.Database(config.DBname)
+	Config.DBMongo = client.Database(config.DBname)
 	fmt.Println("this is mongo : ", client, ctx, cancel)
 
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
@@ -57,33 +43,33 @@ func OpenTestingDatabase() {
 	}
 	fmt.Println("connected successfully")
 
-	UserCollection = DBMongoTest.Collection("User")
-	TicketCollection = DBMongoTest.Collection("Ticket")
-	RoleCollection = DBMongoTest.Collection("Role")
-	PermissionCollection = DBMongoTest.Collection("Permission")
-	RolePermissionCollection = DBMongoTest.Collection("RolePermission")
+	Config.UserCollection = Config.DBMongo.Collection("User")
+	Config.TicketCollection = Config.DBMongo.Collection("Ticket")
+	Config.RoleCollection = Config.DBMongo.Collection("Role")
+	Config.PermissionCollection = Config.DBMongo.Collection("Permission")
+	Config.RolePermissionCollection = Config.DBMongo.Collection("RolePermission")
 }
 
-func OpenTestingRedis() {
-
-	config := Config.RedisConfig{}
-	if parseError := cleanenv.ReadConfig(".test.env", &config); parseError != nil {
-		fmt.Errorf("parsing config: %w", parseError)
-	}
-
-	client := redis.NewClient(&redis.Options{
-		Addr:     config.Host,
-		Password: config.Password,
-		DB:       0,
-	})
-
-	pong, err := client.Ping().Result()
-	if err != nil {
-		log.Fatalf("cannot connect to redis : %s ", err)
-	}
-	Redis = client
-	fmt.Println(pong, err)
-}
+//func OpenTestingRedis() {
+//
+//	config := Config.RedisConfig{}
+//	if parseError := cleanenv.ReadConfig(".test.env", &config); parseError != nil {
+//		fmt.Errorf("parsing config: %w", parseError)
+//	}
+//
+//	client := redis.NewClient(&redis.Options{
+//		Addr:     config.Host,
+//		Password: config.Password,
+//		DB:       0,
+//	})
+//
+//	pong, err := client.Ping().Result()
+//	if err != nil {
+//		log.Fatalf("cannot connect to redis : %s ", err)
+//	}
+//	Redis = client
+//	fmt.Println(pong, err)
+//}
 
 func connect(uri string) (*mongo.Client, context.Context,
 	context.CancelFunc, error) {

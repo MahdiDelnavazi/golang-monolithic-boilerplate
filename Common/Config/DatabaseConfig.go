@@ -3,7 +3,6 @@ package Config
 import (
 	"context"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -27,17 +26,15 @@ type MongoDB struct {
 	DBname string `env:"DB_NAME" env-default:"golang_monolithic_boilerplate"`
 }
 
-var DBMongo *mongo.Database
-var DBPostgres *sqlx.DB
-var err error
-
 var (
+	DBMongo                  *mongo.Database
 	UserCollection           *mongo.Collection
 	TicketCollection         *mongo.Collection
 	RoleCollection           *mongo.Collection
 	PermissionCollection     *mongo.Collection
 	RolePermissionCollection *mongo.Collection
 	DBCtx                    = context.TODO()
+	err                      error
 )
 
 func MongoDatabaseOpen(cfg MongoDB) {

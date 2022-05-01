@@ -1,37 +1,27 @@
 package Controller
 
 import (
-	"github.com/mahdidl/golang_boilerplate/Components/User/Entity"
+	"github.com/mahdidl/golang_boilerplate/Common/Helper"
 	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
-	"github.com/stretchr/testify/require"
-	"go.mongodb.org/mongo-driver/bson"
-
 	"github.com/mahdidl/golang_boilerplate/Test"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
+	"github.com/stretchr/testify/require"
 	"testing"
-	"time"
 )
+
+func init() {
+	Test.OpenTestingDatabase()
+}
 
 func TestUserRepository_ChangeActiveStatus(t *testing.T) {
 
-	Test.OpenTestingDatabase()
+	creatUserRequest := Request.CreateUserRequest{UserName: Helper.RandomString(5), Password: Helper.RandomString(8)}
+	repo := NewUserRepository()
+	require.NotNil(t, repo)
 
-	var user Entity.User
-
-	creatUserRequest := Request.CreateUserRequest{UserName: "mimdl", Password: "salamalekom"}
-
-	result, err := Test.UserCollection.InsertOne(Test.DBCtx, Entity.User{ID: primitive.NewObjectID(), IsActive: true,
-		UserName: creatUserRequest.UserName, Password: creatUserRequest.Password, CreatedAt: time.Now()})
-
-	require.NoError(t, err)
-	require.NotEmpty(t, result.InsertedID)
-
-	err = Test.UserCollection.FindOne(Test.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&user)
+	user, err := repo.CreateUser(creatUserRequest, creatUserRequest.Password)
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 	require.Equal(t, creatUserRequest.UserName, user.UserName)
-
 }
 
 func TestUserRepository_ChangePassword(t *testing.T) {
