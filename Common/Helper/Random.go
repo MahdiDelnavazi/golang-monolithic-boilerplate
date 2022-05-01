@@ -2,25 +2,15 @@ package Helper
 
 import (
 	"math/rand"
-	"strings"
 )
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 // RandomString generates a random string of length n
 func RandomString(n int) string {
-	var sb strings.Builder
-	k := len(alphabet)
-
-	for i := 0; i < n; i++ {
-		c := alphabet[rand.Intn(k)]
-		sb.WriteByte(c)
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
-
-	return sb.String()
-}
-
-// RandomOwner generates a random owner name
-func RandomOwner() string {
-	return RandomString(10)
+	return string(b)
 }

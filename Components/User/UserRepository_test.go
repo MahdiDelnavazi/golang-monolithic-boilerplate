@@ -5,7 +5,9 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
 	"github.com/mahdidl/golang_boilerplate/Test"
 	"github.com/stretchr/testify/require"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func init() {
@@ -13,12 +15,13 @@ func init() {
 }
 
 func TestUserRepository_ChangeActiveStatus(t *testing.T) {
-
+	rand.Seed(time.Now().UnixNano())
 	creatUserRequest := Request.CreateUserRequest{UserName: Helper.RandomString(5), Password: Helper.RandomString(8)}
 	repo := NewUserRepository()
 	require.NotNil(t, repo)
 
 	user, err := repo.CreateUser(creatUserRequest, creatUserRequest.Password)
+
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 	require.Equal(t, creatUserRequest.UserName, user.UserName)
