@@ -24,7 +24,7 @@ func main() {
 	Config.NewLogger("Polaris Storage Service", config.DB.Host)
 
 	// =====================================================
-	// Open Database Connection
+	// Open Test Connection
 	//Config.MongoDatabaseOpen(Config.DatabaseConfig{
 	//	User:         config.DB.User,
 	//	Password:     config.DB.Password,

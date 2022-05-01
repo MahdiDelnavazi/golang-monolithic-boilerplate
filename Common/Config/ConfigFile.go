@@ -26,6 +26,10 @@ type EnvironmentConfig struct {
 		Url    string `env:"DB_URL" env-default:"mongodb://localhost:27017"`
 		DBname string `env:"DB_NAME" env-default:"golang_monolithic_boilerplate"`
 	}
+	MongoDBTest struct {
+		Url    string `env:"DB_URL" env-default:"mongodb://localhost:27017"`
+		DBname string `env:"DB_NAME" env-default:"golang_monolithic_boilerplate_test"`
+	}
 	Redis struct {
 		Host     string `env:"REDIS_HOST" env-default:"localhost:6379"`
 		Password string `env:"REDIS_PASSWORD" env-default:""`

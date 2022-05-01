@@ -8,9 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"log"
-	"net/url"
-	"strings"
 	"time"
 )
 
@@ -26,8 +23,8 @@ type DatabaseConfig struct {
 }
 
 type MongoDB struct {
-	Url    string
-	DBname string
+	Url    string `env:"DB_URL" env-default:"mongodb://localhost:27017"`
+	DBname string `env:"DB_NAME" env-default:"golang_monolithic_boilerplate"`
 }
 
 var DBMongo *mongo.Database
@@ -43,47 +40,16 @@ var (
 	DBCtx                    = context.TODO()
 )
 
-// DatabaseOpen Open knows how to open a database connection based on the configuration.
-func DatabaseOpen(cfg DatabaseConfig) {
-	sslMode := "disable"
-	if cfg.DisableTLS {
-		sslMode = "disable"
-	}
-
-	q := make(url.Values)
-	q.Set("sslmode", sslMode)
-	q.Set("timezone", "utc")
-	q.Set("user", cfg.User)
-	q.Set("password", cfg.Password)
-	q.Set("dbname", cfg.Name)
-
-	databaseConfig := strings.Replace(q.Encode(), "&", " ", -1)
-	fmt.Println("this is database : ", databaseConfig)
-	DBPostgres, err = sqlx.Open("postgres", databaseConfig)
-	if err != nil {
-		log.Fatal("cannot connect to db: ", err)
-	}
-	DBPostgres.SetMaxIdleConns(cfg.MaxIdleConns)
-	DBPostgres.SetMaxOpenConns(cfg.MaxOpenConns)
-
-}
-
 func MongoDatabaseOpen(cfg MongoDB) {
 	// Get Client, Context, CancelFunc and
 	// err from connect method.
-	client, ctx, cancel, err := connect(cfg.Url)
+	client, ctx, _, err := connect(cfg.Url)
 	if err != nil {
 		panic(err)
 	}
 
 	DBMongo = client.Database(cfg.DBname)
-	fmt.Println("this is mongo : ", client, ctx, cancel)
 
-	// Release resource when the main
-	// function is returned.
-	//defer close(client, ctx, cancel)
-
-	// Ping mongoDB with Ping method
 	ping(client, ctx)
 	UserCollection = DBMongo.Collection("User")
 	TicketCollection = DBMongo.Collection("Ticket")
