@@ -30,8 +30,8 @@ func (userService UserService) Create(createUserRequest Request.CreateUserReques
 	if err != nil {
 		return Response.CreateUserResponse{}, err
 	}
-
-	userResponse, userRepositoryError := userService.userRepository.CreateUser(createUserRequest, password)
+	createUserRequest.Password = password
+	userResponse, userRepositoryError := userService.userRepository.CreateUser(createUserRequest)
 	if userRepositoryError != nil {
 		return Response.CreateUserResponse{}, userRepositoryError
 	}
@@ -88,13 +88,13 @@ func (userService UserService) UpdateUser(request Request.UpdateUserRequest) (En
 	return user, nil
 }
 
-func (userService UserService) ChangePassword(request Request.ChangePasswordRequest) (string, error) {
-	message, getUserError := userService.userRepository.ChangePassword(request)
+func (userService UserService) ChangePassword(request Request.ChangePasswordRequest) (Entity.User, error) {
+	user, getUserError := userService.userRepository.ChangePassword(request)
 	if getUserError != nil {
-		return "", getUserError
+		return Entity.User{}, getUserError
 	}
 
-	return message, nil
+	return user, nil
 }
 
 func (userService UserService) ChangeActiveStatus(request Request.ChangeStatusRequest) (Entity.User, error) {

@@ -22,11 +22,11 @@ func NewUserRepository() *UserRepository {
 }
 
 // CreateUser exec query for create new user in database
-func (userRepository *UserRepository) CreateUser(creatUserRequest Request.CreateUserRequest, password string) (Entity.User, error) {
+func (userRepository *UserRepository) CreateUser(creatUserRequest Request.CreateUserRequest) (Entity.User, error) {
 	user := Entity.User{}
 
 	result, err := Config.UserCollection.InsertOne(Config.DBCtx, Entity.User{ID: primitive.NewObjectID(), IsActive: true,
-		UserName: creatUserRequest.UserName, Password: password, CreatedAt: time.Now()})
+		UserName: creatUserRequest.UserName, Password: creatUserRequest.Password, CreatedAt: time.Now()})
 	if err != nil {
 		return Entity.User{}, err
 	}
@@ -102,28 +102,30 @@ func (usserRepository UserRepository) UpdateUser(request Request.UpdateUserReque
 		{"$set", bson.D{{"UserName", request.UserName}, {"Active", request.Active}, {"RoleId", nil}, {"UpdatedAt", time.Now()}}},
 	}
 	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
-	fmt.Println("update result ", result)
+
 	if result != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
 	return user, result
 }
 
-func (usserRepository UserRepository) ChangePassword(request Request.ChangePasswordRequest) (string, error) {
+func (usserRepository UserRepository) ChangePassword(request Request.ChangePasswordRequest) (Entity.User, error) {
 	var user Entity.User
 
-	id1, err := primitive.ObjectIDFromHex(request.ID)
+	id1, err := primitive.ObjectIDFromHex(request.Id)
+	fmt.Println(id1)
 	if err != nil {
-		return "", fmt.Errorf("id is not valid")
+		return Entity.User{}, fmt.Errorf("id is not valid")
 	}
 
 	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
 	if queryError != nil {
-		return "", fmt.Errorf("user not found")
+		return Entity.User{}, fmt.Errorf("user not found")
 	}
+
 	isPasswordOk := Helper.CheckPasswordHash(request.CurrentPassword, user.Password)
 	if !isPasswordOk {
-		return "", fmt.Errorf("user not found")
+		return Entity.User{}, fmt.Errorf("user not found")
 	}
 
 	hashedPassword, _ := Helper.HashPassword(request.NewPassword)
@@ -132,9 +134,9 @@ func (usserRepository UserRepository) ChangePassword(request Request.ChangePassw
 	}
 	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if result != nil {
-		return "", fmt.Errorf("user not found")
+		return Entity.User{}, fmt.Errorf("user not found")
 	}
-	return "password is changed", nil
+	return user, nil
 }
 
 func (userRepository UserRepository) GetAllUsers(page int, limit int) ([]Entity.User, error) {
