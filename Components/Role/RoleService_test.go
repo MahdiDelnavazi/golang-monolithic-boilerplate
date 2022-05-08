@@ -36,7 +36,7 @@ func TestRoleService_Delete(t *testing.T) {
 	require.NotNil(t, role)
 	require.Equal(t, role.Name, roleName)
 
-	deleteRoleRequest := Request.DeleteRole{Id: role.ID.Hex()}
+	deleteRoleRequest := Request.DeleteRole{Id: role.Id.Hex()}
 	deleteRoleResponse, err := roleService.Delete(deleteRoleRequest)
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
@@ -72,11 +72,11 @@ func TestRoleService_GetRoleById(t *testing.T) {
 	require.NotNil(t, role)
 	require.Equal(t, role.Name, roleName)
 
-	getRole, err := roleService.GetRoleById(role.ID.Hex())
+	getRole, err := roleService.GetRoleById(role.Id.Hex())
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 	require.NotNil(t, role)
-	require.Equal(t, getRole.Roles.Id, role.ID)
+	require.Equal(t, getRole.Roles.Id, role.Id)
 
 }
 
@@ -90,7 +90,7 @@ func TestRoleService_Update(t *testing.T) {
 	require.NotNil(t, role)
 	require.Equal(t, role.Name, roleName)
 
-	updateRoleRequest := Request.UpdateRole{Id: role.ID.Hex(), Name: "jfuyf"}
+	updateRoleRequest := Request.UpdateRole{Id: role.Id.Hex(), Name: "jfuyf"}
 	updatedRole, err := roleService.Update(updateRoleRequest)
 	require.NoError(t, err)
 	require.NotEmpty(t, role)

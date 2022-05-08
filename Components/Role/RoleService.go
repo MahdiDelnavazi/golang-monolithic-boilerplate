@@ -1,6 +1,7 @@
 package Role
 
 import (
+	"github.com/mahdidl/golang_boilerplate/Components/Role/Entity"
 	"github.com/mahdidl/golang_boilerplate/Components/Role/Request"
 	"github.com/mahdidl/golang_boilerplate/Components/Role/Response"
 )
@@ -13,14 +14,14 @@ func NewRoleService(permissionRepository *RoleRepository) *RoleService {
 	return &RoleService{roleRepository: permissionRepository}
 }
 
-func (roleService *RoleService) Create(request Request.CreateRole) (response Response.CreateRole, err error) {
+func (roleService *RoleService) Create(request Request.CreateRole) (response Entity.Role, err error) {
 
-	permission, err := roleService.roleRepository.Create(request)
+	role, err := roleService.roleRepository.Create(request)
 	if err != nil {
-		return Response.CreateRole{}, err
+		return Entity.Role{}, err
 	}
 
-	return Response.CreateRole{ID: permission.Id, Name: permission.Name}, nil
+	return role, nil
 }
 
 func (roleService *RoleService) GetAll(request Request.GetAllRole) (response Response.GetAllRoles, err error) {
