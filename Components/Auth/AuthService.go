@@ -13,9 +13,8 @@ func NewAuthService() *AuthService {
 	return &AuthService{}
 }
 
-func (authUserService AuthService) CreateAccessToken(accessTokenReq User.AccessTokenRequest) (response string, err error) {
+func (authService *AuthService) CreateAccessToken(accessTokenReq User.AccessTokenRequest) (response string, err error) {
 
-	//todo: move to service
 	payload, err := token.MakerPaseto.VerifyToken(accessTokenReq.AccessToken)
 	if err != nil {
 		return "", err

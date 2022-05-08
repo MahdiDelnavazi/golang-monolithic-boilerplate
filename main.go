@@ -34,7 +34,7 @@ func main() {
 	//	MaxOpenConns: config.DB.MaxOpenConns,
 	//	DisableTLS:   config.DB.DisableTLS,
 	//})
-	fmt.Println("this is mongo cofig :", config.MongoDB)
+
 	Config.MongoDatabaseOpen(Config.MongoDB{Url: config.MongoDB.Url, DBname: config.MongoDB.DBname})
 	//defer func() {
 	//	Config.DB.Close()

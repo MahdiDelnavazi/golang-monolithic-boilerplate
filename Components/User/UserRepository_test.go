@@ -17,10 +17,10 @@ func init() {
 	repo = NewUserRepository()
 }
 
+// context , when , it
 func TestUserRepository_ChangeActiveStatus(t *testing.T) {
 	require.NotNil(t, repo)
 
-	rand.Seed(time.Now().UnixNano())
 	password := Helper.RandomString(8)
 	hashedPassword, err := Helper.HashPassword(password)
 	creatUserRequest := Request.CreateUserRequest{UserName: Helper.RandomString(5), Password: hashedPassword}
@@ -43,7 +43,6 @@ func TestUserRepository_ChangeActiveStatus(t *testing.T) {
 func TestUserRepository_ChangePassword(t *testing.T) {
 	require.NotNil(t, repo)
 
-	rand.Seed(time.Now().UnixNano())
 	password := Helper.RandomString(8)
 	hashedPassword, err := Helper.HashPassword(password)
 	require.Nil(t, err)
@@ -74,7 +73,6 @@ func TestUserRepository_ChangePassword(t *testing.T) {
 func TestUserRepository_CreateUser(t *testing.T) {
 	require.NotNil(t, repo)
 
-	rand.Seed(time.Now().UnixNano())
 	creatUserRequest := Request.CreateUserRequest{UserName: Helper.RandomString(5), Password: Helper.RandomString(8)}
 
 	user, err := repo.CreateUser(creatUserRequest)
@@ -87,7 +85,6 @@ func TestUserRepository_CreateUser(t *testing.T) {
 func TestUserRepository_CheckUserName(t *testing.T) {
 	require.NotNil(t, repo)
 
-	rand.Seed(time.Now().UnixNano())
 	creatUserRequest := Request.CreateUserRequest{UserName: Helper.RandomString(5), Password: Helper.RandomString(8)}
 	repo := NewUserRepository()
 
@@ -106,7 +103,7 @@ func TestUserRepository_GetAllUsers(t *testing.T) {
 }
 
 func TestUserRepository_GetUserById(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+
 	password := Helper.RandomString(8)
 	hashedPassword, err := Helper.HashPassword(password)
 	require.Nil(t, err)
@@ -128,7 +125,7 @@ func TestUserRepository_GetUserById(t *testing.T) {
 }
 
 func TestUserRepository_GetUserByUsername(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+
 	password := Helper.RandomString(8)
 	hashedPassword, err := Helper.HashPassword(password)
 	require.Nil(t, err)
@@ -150,7 +147,7 @@ func TestUserRepository_GetUserByUsername(t *testing.T) {
 }
 
 func TestUserRepository_LoginUser(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+
 	password := Helper.RandomString(8)
 	username := Helper.RandomString(5)
 	hashedPassword, err := Helper.HashPassword(password)
@@ -175,7 +172,7 @@ func TestUserRepository_LoginUser(t *testing.T) {
 }
 
 func TestUserRepository_UpdateUser(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
+
 	password := Helper.RandomString(8)
 	username := Helper.RandomString(5)
 	hashedPassword, err := Helper.HashPassword(password)

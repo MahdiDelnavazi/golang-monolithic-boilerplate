@@ -35,7 +35,7 @@ func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
 	ticketResponse, responseError := ticketControler.ticketService.CreateTicket(ticketRequest)
 
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": General.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 

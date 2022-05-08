@@ -62,7 +62,7 @@ func Routes(app *gin.Engine) {
 	newPermissionController := Permission.NewPermissionController(newPermissionService)
 
 	newRoleRepository := Role.NewRoleRepository()
-	newRoleService := Role.NewPermissionService(newRoleRepository)
+	newRoleService := Role.NewRoleService(newRoleRepository)
 	newRoleController := Role.NewRoleController(newRoleService)
 
 	newRolePermissionRepository := RolePermission.NewRolePermissionRepository()

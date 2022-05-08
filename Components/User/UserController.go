@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mahdidl/golang_boilerplate/Common/Response"
 	"github.com/mahdidl/golang_boilerplate/Common/Validator"
-	Response2 "github.com/mahdidl/golang_boilerplate/Components/Ticket/Response"
 	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
 	Response3 "github.com/mahdidl/golang_boilerplate/Components/User/Response"
 
@@ -43,7 +42,7 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 			return
 		}
 		// if username is empty means its validation error
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
@@ -69,7 +68,7 @@ func (userControler *UserController) LoginUser(context *gin.Context) {
 	userResponse, responseError := userControler.userService.LoginUser(userRequest)
 
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
@@ -118,7 +117,7 @@ func (userController *UserController) GetUserById(context *gin.Context) {
 
 	result, responseError := userController.userService.GetUserById(userRequest)
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
@@ -142,7 +141,7 @@ func (userController *UserController) UpdateUser(context *gin.Context) {
 
 	result, responseError := userController.userService.UpdateUser(userRequest)
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
@@ -165,7 +164,7 @@ func (userController *UserController) ChangeActiveStatus(context *gin.Context) {
 
 	result, responseError := userController.userService.ChangeActiveStatus(userRequest)
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 
@@ -189,7 +188,7 @@ func (userController *UserController) ChangePassword(context *gin.Context) {
 
 	result, responseError := userController.userService.ChangePassword(userRequest)
 	if responseError != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"response": Response2.ErrorResponse{Error: responseError.Error()}})
+		context.JSON(http.StatusBadRequest, gin.H{"response": Response.ErrorResponse{Error: responseError.Error()}})
 		return
 	}
 

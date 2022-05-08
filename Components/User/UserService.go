@@ -19,27 +19,27 @@ func NewUserService(userRepository *UserRepository) *UserService {
 	return &UserService{userRepository: userRepository}
 }
 
-func (userService UserService) Create(createUserRequest Request.CreateUserRequest) (Response.CreateUserResponse, error) {
+func (userService *UserService) Create(createUserRequest Request.CreateUserRequest) (Entity.User, error) {
 	// check if user exist return error .
 	checkUserName, _ := userService.userRepository.CheckUserName(createUserRequest)
 	if checkUserName.UserName != "" {
-		return Response.CreateUserResponse{UserName: checkUserName.UserName}, errors.New("user exist")
+		return Entity.User{UserName: checkUserName.UserName}, errors.New("user exist")
 	}
 
 	password, err := Helper.HashPassword(createUserRequest.Password)
 	if err != nil {
-		return Response.CreateUserResponse{}, err
+		return Entity.User{}, err
 	}
 	createUserRequest.Password = password
 	userResponse, userRepositoryError := userService.userRepository.CreateUser(createUserRequest)
 	if userRepositoryError != nil {
-		return Response.CreateUserResponse{}, userRepositoryError
+		return Entity.User{}, userRepositoryError
 	}
 
-	return Response.CreateUserResponse{UserName: userResponse.UserName}, nil
+	return userResponse, nil
 }
 
-func (userService UserService) LoginUser(loginUserRequest Request.LoginUserRequest) (Response.LoginUserResponse, error) {
+func (userService *UserService) LoginUser(loginUserRequest Request.LoginUserRequest) (Response.LoginUserResponse, error) {
 	user, getUserError := userService.userRepository.LoginUser(loginUserRequest)
 	if getUserError != nil {
 		return Response.LoginUserResponse{}, getUserError
@@ -60,7 +60,7 @@ func (userService UserService) LoginUser(loginUserRequest Request.LoginUserReque
 	return Response.LoginUserResponse{UserName: user.UserName, AccessToken: accessToken, RefreshToken: refreshToken, ID: user.ID.Hex()}, nil
 }
 
-func (userService UserService) GetUser(getUserRequest Request.GetUserRequest) (Response.GetUserResponse, error) {
+func (userService *UserService) GetUser(getUserRequest Request.GetUserRequest) (Response.GetUserResponse, error) {
 	user, getUserError := userService.userRepository.GetUserByUsername(getUserRequest.UserName)
 	if getUserError != nil {
 		return Response.GetUserResponse{}, getUserError
@@ -69,7 +69,7 @@ func (userService UserService) GetUser(getUserRequest Request.GetUserRequest) (R
 	return Response.GetUserResponse{UserId: user.ID, UserName: user.UserName}, nil
 }
 
-func (userService UserService) GetUserById(getUserRequest Request.GetUser) (Entity.User, error) {
+func (userService *UserService) GetUserById(getUserRequest Request.GetUser) (Entity.User, error) {
 	user, getUserError := userService.userRepository.GetUserById(getUserRequest.ID)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
@@ -78,7 +78,7 @@ func (userService UserService) GetUserById(getUserRequest Request.GetUser) (Enti
 	return user, nil
 }
 
-func (userService UserService) UpdateUser(request Request.UpdateUserRequest) (Entity.User, error) {
+func (userService *UserService) UpdateUser(request Request.UpdateUserRequest) (Entity.User, error) {
 
 	user, getUserError := userService.userRepository.UpdateUser(request)
 	if getUserError != nil {
@@ -88,7 +88,7 @@ func (userService UserService) UpdateUser(request Request.UpdateUserRequest) (En
 	return user, nil
 }
 
-func (userService UserService) ChangePassword(request Request.ChangePasswordRequest) (Entity.User, error) {
+func (userService *UserService) ChangePassword(request Request.ChangePasswordRequest) (Entity.User, error) {
 	user, getUserError := userService.userRepository.ChangePassword(request)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
@@ -97,7 +97,7 @@ func (userService UserService) ChangePassword(request Request.ChangePasswordRequ
 	return user, nil
 }
 
-func (userService UserService) ChangeActiveStatus(request Request.ChangeStatusRequest) (Entity.User, error) {
+func (userService *UserService) ChangeActiveStatus(request Request.ChangeStatusRequest) (Entity.User, error) {
 	user, getUserError := userService.userRepository.ChangeActiveStatus(request.ID)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
@@ -106,7 +106,7 @@ func (userService UserService) ChangeActiveStatus(request Request.ChangeStatusRe
 	return user, nil
 }
 
-func (userService UserService) GetAllUsers(page int, limit int) (Response.ResponseAllUsers, error) {
+func (userService *UserService) GetAllUsers(page int, limit int) (Response.ResponseAllUsers, error) {
 
 	listUsers, err := userService.userRepository.GetAllUsers(page, limit)
 	if err != nil {
