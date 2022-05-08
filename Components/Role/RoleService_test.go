@@ -90,7 +90,7 @@ func TestRoleService_Update(t *testing.T) {
 	require.NotNil(t, role)
 	require.Equal(t, role.Name, roleName)
 
-	updateRoleRequest := Request.UpdateRole{Id: role.ID.Hex(), Name: Helper.RandomString(5)}
+	updateRoleRequest := Request.UpdateRole{Id: role.ID.Hex(), Name: "jfuyf"}
 	updatedRole, err := roleService.Update(updateRoleRequest)
 	require.NoError(t, err)
 	require.NotEmpty(t, role)

@@ -29,14 +29,12 @@ func OpenTestingDatabase() {
 		fmt.Errorf("parsing config: %w", parseError)
 	}
 
-	fmt.Println(config)
-	client, ctx, cancel, err := connect(config.Url)
+	client, ctx, _, err := connect(config.Url)
 	if err != nil {
 		panic(err)
 	}
 
 	Config.DBMongo = client.Database(config.DBname)
-	fmt.Println("this is mongo : ", client, ctx, cancel)
 
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		panic(err)

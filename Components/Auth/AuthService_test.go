@@ -23,7 +23,6 @@ func init() {
 		fmt.Errorf("parsing config: %w", parseError)
 	}
 
-	fmt.Println("this is config : ", config)
 	token.NewPasetoMaker(config.Token.TokenSymmetricKey)
 }
 

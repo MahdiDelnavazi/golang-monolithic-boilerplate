@@ -34,7 +34,6 @@ func (userRepository *UserRepository) CreateUser(creatUserRequest Request.Create
 	if err = Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&user); err != nil {
 		return Entity.User{}, err
 	}
-	fmt.Println("this is new user : ", user)
 
 	return user, err
 }
@@ -114,7 +113,7 @@ func (usserRepository UserRepository) ChangePassword(request Request.ChangePassw
 	var user Entity.User
 
 	id1, err := primitive.ObjectIDFromHex(request.Id)
-	fmt.Println(id1)
+
 	if err != nil {
 		return Entity.User{}, fmt.Errorf("id is not valid")
 	}

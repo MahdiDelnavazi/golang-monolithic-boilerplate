@@ -2,7 +2,6 @@ package UserRole
 
 import (
 	"errors"
-	"fmt"
 	"github.com/mahdidl/golang_boilerplate/Common/Config"
 	RoleEntity "github.com/mahdidl/golang_boilerplate/Components/Role/Entity"
 	"github.com/mahdidl/golang_boilerplate/Components/UserRole/Entity"
@@ -24,7 +23,6 @@ func (rolePermissionRepository UserRoleRepository) Attach(request Request.Attach
 	var role RoleEntity.Role
 	var user Entity.UserRole
 
-	fmt.Println("salaam ", request)
 	UserId, err := primitive.ObjectIDFromHex(request.UserId)
 	if err != nil {
 		return Entity.UserRole{}, errors.New("invalid user id")
@@ -53,7 +51,6 @@ func (rolePermissionRepository UserRoleRepository) Attach(request Request.Attach
 func (rolePermissionRepository UserRoleRepository) Detach(request Request.DetachRole) (Entity.UserRole, error) {
 	var user Entity.UserRole
 
-	fmt.Println("this is bug ", request)
 	userId, err := primitive.ObjectIDFromHex(request.UserId)
 	if err != nil {
 		return Entity.UserRole{}, errors.New("invalid user id")
@@ -64,7 +61,7 @@ func (rolePermissionRepository UserRoleRepository) Detach(request Request.Detach
 
 	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": userId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if resultErr != nil {
-		fmt.Println("this is result error  ", resultErr)
+
 		return Entity.UserRole{}, resultErr
 	}
 

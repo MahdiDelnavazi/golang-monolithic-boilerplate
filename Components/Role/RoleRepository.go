@@ -103,7 +103,7 @@ func (roleRepository RoleRepository) Delete(request Request.DeleteRole) (Entity.
 	}
 
 	result := Config.RoleCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&role)
-	fmt.Println("update result ", result)
+
 	if result != nil {
 		return Entity.Role{}, fmt.Errorf("role not found")
 	}

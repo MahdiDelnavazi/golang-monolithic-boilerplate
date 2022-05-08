@@ -23,7 +23,6 @@ func init() {
 		fmt.Errorf("parsing config: %w", parseError)
 	}
 
-	fmt.Println("this is config : ", config)
 	token.NewPasetoMaker(config.Token.TokenSymmetricKey)
 
 }
@@ -32,7 +31,6 @@ func TestUserService_ChangeActiveStatus(t *testing.T) {
 	userRequest := Request.CreateUserRequest{UserName: Helper.RandomString(5), Password: Helper.RandomString(8)}
 	userResponse, err := userService.Create(userRequest)
 
-	fmt.Println(userResponse)
 	require.NoError(t, err)
 	require.NotEmpty(t, userResponse)
 	require.NotNil(t, userResponse)

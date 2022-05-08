@@ -17,7 +17,6 @@ func main() {
 	if parseError := cleanenv.ReadConfig(".env", &config); parseError != nil {
 		fmt.Errorf("parsing config: %w", parseError)
 	}
-	fmt.Printf("%+v\n", config)
 
 	// =====================================================
 	// Config logger

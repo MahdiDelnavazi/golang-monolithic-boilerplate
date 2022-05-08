@@ -2,7 +2,6 @@ package RolePermission
 
 import (
 	"errors"
-	"fmt"
 	"github.com/mahdidl/golang_boilerplate/Common/Config"
 	PermissionEntity "github.com/mahdidl/golang_boilerplate/Components/Permission/Entity"
 	RoleEntity "github.com/mahdidl/golang_boilerplate/Components/Role/Entity"
@@ -40,7 +39,6 @@ func (rolePermissionRepository RolePermissionRepository) Attach(request Request.
 		},
 	}
 
-	fmt.Println("ids : ", PermissionId, RoleId, permission)
 	resultErr := Config.RoleCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": RoleId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&role)
 	if resultErr != nil {
 		return RoleEntity.Role{}, resultErr
