@@ -1,0 +1,12 @@
+consumes:
+- application/json
+info:
+  description: golang monolothic boilerplate
+  title: golang boilerplate
+  version: 1.0.0
+paths: {}
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"

@@ -1,0 +1,653 @@
+basePath: /api/v1
+definitions:
+  Entity.Role:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissionsId:
+        items:
+          type: string
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  Entity.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      id:
+        type: string
+      isActive:
+        type: boolean
+      password:
+        type: string
+      roleID:
+        type: string
+      updatedAt:
+        type: string
+      userName:
+        type: string
+    type: object
+  Request.ChangePasswordRequest:
+    properties:
+      currentPassword:
+        minLength: 8
+        type: string
+      newPassword:
+        minLength: 8
+        type: string
+    required:
+    - currentPassword
+    - newPassword
+    type: object
+  Request.CreateRole:
+    properties:
+      Name:
+        minLength: 3
+        type: string
+    required:
+    - Name
+    type: object
+  Request.CreateUserRequest:
+    properties:
+      password:
+        description: |-
+          password of the user
+          in: string
+        minLength: 8
+        type: string
+      username:
+        description: |-
+          username of the user
+          in: string
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  Request.UpdateUserRequest:
+    properties:
+      userName:
+        type: string
+    type: object
+  Response.GeneralResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    required:
+    - data
+    - error
+    - message
+    type: object
+  Response.GetAllRoles:
+    properties:
+      Role:
+        items:
+          $ref: '#/definitions/Entity.Role'
+        type: array
+    type: object
+  Response.GetRole:
+    properties:
+      Role:
+        $ref: '#/definitions/Entity.Role'
+    type: object
+  Response.LoginUserResponse:
+    properties:
+      accessToken:
+        type: string
+      id:
+        type: string
+      refreshToken:
+        type: string
+      username:
+        type: string
+    type: object
+  Response.ResponseAllUsers:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/Entity.User'
+        type: array
+    type: object
+  User.AccessTokenRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  User.LogoutRequest:
+    properties:
+      token:
+        minLength: 3
+        type: string
+    required:
+    - token
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: team@supnex.com
+    name: Supnex
+    url: https://supne.com/
+  description: Golang Monolithic Boilerplate
+  title: Golang Monolithic Boilerplate
+  version: "1.0"
+paths:
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user with access token
+      parameters:
+      - description: logout user
+        in: body
+        name: LogoutUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/User.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: when access token is not valid
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Logout user
+      tags:
+      - Auth
+  /auth/newToken:
+    post:
+      consumes:
+      - application/json
+      description: New access token with refresh token
+      parameters:
+      - description: for get new access token
+        in: body
+        name: AccessTokenRequest
+        required: true
+        schema:
+          $ref: '#/definitions/User.AccessTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/User.AccessTokenRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: New access token
+      tags:
+      - Auth
+  /role/{roleId}:
+    get:
+      consumes:
+      - application/json
+      description: Get role
+      parameters:
+      - description: get role with id
+        in: path
+        name: GetRolRequest
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.GetRole'
+              type: object
+        "400":
+          description: get role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get role
+      tags:
+      - Role
+  /role/create:
+    post:
+      consumes:
+      - application/json
+      description: Create role
+      parameters:
+      - description: Create role request
+        in: body
+        name: CreateRoleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.Role'
+              type: object
+        "400":
+          description: create role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create role
+      tags:
+      - Role
+  /role/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Create role
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.GetAllRoles'
+              type: object
+        "400":
+          description: create role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create role
+      tags:
+      - Role
+  /user/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get user return user with id
+      parameters:
+      - description: user id
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user not exist or id is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get user
+      tags:
+      - User
+    patch:
+      consumes:
+      - application/json
+      description: Update user change user fields and return user
+      parameters:
+      - description: update user request
+        in: body
+        name: updateUser
+        required: true
+        schema:
+          $ref: '#/definitions/Request.UpdateUserRequest'
+      - description: user id
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user not exist or id is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update user
+      tags:
+      - User
+  /user/change-password/{userId}:
+    put:
+      consumes:
+      - application/json
+      description: Change user password
+      parameters:
+      - description: user id
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: change user password request
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/Request.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user not exist or id is incorrect or password in incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password
+      tags:
+      - User
+  /user/change-status/{userId}:
+    patch:
+      consumes:
+      - application/json
+      description: Change user active status with id
+      parameters:
+      - description: user id
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user not exist or id is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Change user active status
+      tags:
+      - User
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: Create user request
+        in: body
+        name: CreateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user exist or password < 8 character
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create user
+      tags:
+      - User
+  /user/get-all:
+    get:
+      consumes:
+      - application/json
+      description: Get all users return all users with pagination
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.ResponseAllUsers'
+              type: object
+        "400":
+          description: when user not exist or password is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all users
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user with username and password
+      parameters:
+      - description: Create user request
+        in: body
+        name: LoginUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.LoginUserResponse'
+              type: object
+        "400":
+          description: when user not exist or password is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Login user
+      tags:
+      - Auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
