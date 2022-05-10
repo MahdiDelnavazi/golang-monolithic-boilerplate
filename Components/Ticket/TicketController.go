@@ -5,8 +5,9 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Common/Helper"
 	General "github.com/mahdidl/golang_boilerplate/Common/Response"
 	"github.com/mahdidl/golang_boilerplate/Common/Validator"
-	Ticket "github.com/mahdidl/golang_boilerplate/Components/Ticket/Request"
+	Request "github.com/mahdidl/golang_boilerplate/Components/Ticket/Request"
 	Response "github.com/mahdidl/golang_boilerplate/Components/Ticket/Response"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"log"
 
@@ -22,7 +23,7 @@ func NewTicketController(ticketService *TicketService) *TicketController {
 }
 
 func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
-	var ticketRequest Ticket.CreateTicketRequest
+	var ticketRequest Request.CreateTicketRequest
 	Helper.Decode(context.Request, &ticketRequest)
 
 	validationError := Validator.ValidationCheck(ticketRequest)
@@ -30,9 +31,20 @@ func (ticketControler *TicketController) CreateTicket(context *gin.Context) {
 	if validationError != nil {
 		response := General.GeneralResponse{Error: true, Message: validationError.Error()}
 		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
 	}
 
-	ticketResponse, responseError := ticketControler.ticketService.CreateTicket(ticketRequest)
+	userId := context.Param("userId")
+
+	validationErr := primitive.IsValidObjectID(userId)
+
+	if !validationErr {
+		response := General.GeneralResponse{Error: true, Message: "id is not valid"}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	ticketResponse, responseError := ticketControler.ticketService.CreateTicket(ticketRequest, userId)
 
 	if responseError != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"response": General.ErrorResponse{Error: responseError.Error()}})

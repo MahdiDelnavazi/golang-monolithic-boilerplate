@@ -65,7 +65,7 @@ func (userRepository *UserRepository) CheckUserName(creatUserRequest Request.Cre
 	return user, queryError
 }
 
-func (usserRepository UserRepository) GetUserByUsername(username string) (Entity.User, error) {
+func (usserRepository *UserRepository) GetUserByUsername(username string) (Entity.User, error) {
 	var user Entity.User
 
 	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"UserName": username}).Decode(&user)
@@ -76,7 +76,7 @@ func (usserRepository UserRepository) GetUserByUsername(username string) (Entity
 	return user, queryError
 }
 
-func (usserRepository UserRepository) GetUserById(id string) (Entity.User, error) {
+func (usserRepository *UserRepository) GetUserById(id string) (Entity.User, error) {
 	var user Entity.User
 
 	id1, err := primitive.ObjectIDFromHex(id)
@@ -91,15 +91,15 @@ func (usserRepository UserRepository) GetUserById(id string) (Entity.User, error
 	return user, queryError
 }
 
-func (usserRepository UserRepository) UpdateUser(request Request.UpdateUserRequest) (Entity.User, error) {
+func (usserRepository *UserRepository) UpdateUser(request Request.UpdateUserRequest, userId string) (Entity.User, error) {
 	var user Entity.User
 
-	id1, err := primitive.ObjectIDFromHex(request.ID)
+	id1, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return Entity.User{}, fmt.Errorf("id is not valid")
 	}
 	update := bson.D{
-		{"$set", bson.D{{"UserName", request.UserName}, {"Active", request.Active}, {"RoleId", nil}, {"UpdatedAt", time.Now()}}},
+		{"$set", bson.D{{"UserName", request.UserName}, {"UpdatedAt", time.Now()}}},
 	}
 	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 
@@ -109,10 +109,10 @@ func (usserRepository UserRepository) UpdateUser(request Request.UpdateUserReque
 	return user, result
 }
 
-func (usserRepository UserRepository) ChangePassword(request Request.ChangePasswordRequest) (Entity.User, error) {
+func (usserRepository *UserRepository) ChangePassword(request Request.ChangePasswordRequest, userId string) (Entity.User, error) {
 	var user Entity.User
 
-	id1, err := primitive.ObjectIDFromHex(request.Id)
+	id1, err := primitive.ObjectIDFromHex(userId)
 
 	if err != nil {
 		return Entity.User{}, fmt.Errorf("id is not valid")
@@ -139,7 +139,7 @@ func (usserRepository UserRepository) ChangePassword(request Request.ChangePassw
 	return user, nil
 }
 
-func (userRepository UserRepository) GetAllUsers(page int, limit int) ([]Entity.User, error) {
+func (userRepository *UserRepository) GetAllUsers(page int, limit int) ([]Entity.User, error) {
 	var userList = make([]Entity.User, 0)
 
 	userCursor, queryError := Config.UserCollection.Find(Config.DBCtx, bson.M{}, Helper.NewMongoPaginate(limit, page).GetPaginatedOpts())
@@ -159,27 +159,30 @@ func (userRepository UserRepository) GetAllUsers(page int, limit int) ([]Entity.
 	return userList, queryError
 }
 
-func (userRepository UserRepository) ChangeActiveStatus(id string) (Entity.User, error) {
+func (userRepository *UserRepository) ChangeActiveStatus(userId string) (Entity.User, error) {
 	var user Entity.User
 
-	id1, err := primitive.ObjectIDFromHex(id)
+	id1, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return Entity.User{}, fmt.Errorf("id is not valid")
 	}
 
+	fmt.Println("user", user, id1)
 	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
+	fmt.Println("user", user)
 
 	update := bson.D{
 		{"$set", bson.D{{"IsActive", !user.IsActive}, {"UpdatedAt", time.Now()}}},
 	}
 	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	fmt.Println("user", user)
 	if result != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
 
-	return user, queryError
+	return user, nil
 
 }

@@ -124,27 +124,6 @@ func TestUserService_GetUserById(t *testing.T) {
 	require.Equal(t, getUserResponse.UserName, username)
 }
 
-func TestUserService_LoginUser(t *testing.T) {
-	username := Helper.RandomString(5)
-	password := Helper.RandomString(8)
-	userRequest := Request.CreateUserRequest{UserName: username, Password: password}
-	userResponse, err := userService.Create(userRequest)
-
-	require.NoError(t, err)
-	require.NotEmpty(t, userResponse)
-	require.NotNil(t, userResponse)
-	require.Equal(t, userResponse.UserName, userRequest.UserName)
-
-	loginUserRequest := Request.LoginUserRequest{UserName: username, Password: password}
-	loginUserRespose, err := userService.LoginUser(loginUserRequest)
-	require.NoError(t, err)
-	require.NotNil(t, loginUserRespose)
-	require.Equal(t, loginUserRespose.UserName, username)
-	require.NotEmpty(t, loginUserRespose.AccessToken)
-	require.NotEmpty(t, loginUserRespose.RefreshToken)
-
-}
-
 func TestUserService_UpdateUser(t *testing.T) {
 	username := Helper.RandomString(5)
 	password := Helper.RandomString(8)

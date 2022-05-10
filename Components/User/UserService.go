@@ -3,12 +3,9 @@ package Controller
 import (
 	"errors"
 	"github.com/mahdidl/golang_boilerplate/Common/Helper"
-	token "github.com/mahdidl/golang_boilerplate/Common/Token"
 	"github.com/mahdidl/golang_boilerplate/Components/User/Entity"
 	"github.com/mahdidl/golang_boilerplate/Components/User/Request"
 	"github.com/mahdidl/golang_boilerplate/Components/User/Response"
-
-	"time"
 )
 
 type UserService struct {
@@ -39,27 +36,6 @@ func (userService *UserService) Create(createUserRequest Request.CreateUserReque
 	return userResponse, nil
 }
 
-func (userService *UserService) LoginUser(loginUserRequest Request.LoginUserRequest) (Response.LoginUserResponse, error) {
-	user, getUserError := userService.userRepository.LoginUser(loginUserRequest)
-	if getUserError != nil {
-		return Response.LoginUserResponse{}, getUserError
-	}
-
-	//create new token for login
-	accessToken, err := token.MakerPaseto.CreateToken(loginUserRequest.UserName, time.Hour*10000)
-	if err != nil {
-		return Response.LoginUserResponse{}, err
-	}
-
-	refreshToken, errRefreshToken := token.MakerPaseto.CreateToken(loginUserRequest.UserName, time.Hour*120)
-	if errRefreshToken != nil {
-		return Response.LoginUserResponse{}, err
-	}
-
-	// we need a transformer
-	return Response.LoginUserResponse{UserName: user.UserName, AccessToken: accessToken, RefreshToken: refreshToken, ID: user.ID.Hex()}, nil
-}
-
 func (userService *UserService) GetUser(getUserRequest Request.GetUserRequest) (Response.GetUserResponse, error) {
 	user, getUserError := userService.userRepository.GetUserByUsername(getUserRequest.UserName)
 	if getUserError != nil {
@@ -69,8 +45,8 @@ func (userService *UserService) GetUser(getUserRequest Request.GetUserRequest) (
 	return Response.GetUserResponse{UserId: user.ID, UserName: user.UserName}, nil
 }
 
-func (userService *UserService) GetUserById(getUserRequest Request.GetUser) (Entity.User, error) {
-	user, getUserError := userService.userRepository.GetUserById(getUserRequest.ID)
+func (userService *UserService) GetUserById(getUserRequest string) (Entity.User, error) {
+	user, getUserError := userService.userRepository.GetUserById(getUserRequest)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
 	}
@@ -78,9 +54,9 @@ func (userService *UserService) GetUserById(getUserRequest Request.GetUser) (Ent
 	return user, nil
 }
 
-func (userService *UserService) UpdateUser(request Request.UpdateUserRequest) (Entity.User, error) {
+func (userService *UserService) UpdateUser(request Request.UpdateUserRequest, userId string) (Entity.User, error) {
 
-	user, getUserError := userService.userRepository.UpdateUser(request)
+	user, getUserError := userService.userRepository.UpdateUser(request, userId)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
 	}
@@ -88,8 +64,8 @@ func (userService *UserService) UpdateUser(request Request.UpdateUserRequest) (E
 	return user, nil
 }
 
-func (userService *UserService) ChangePassword(request Request.ChangePasswordRequest) (Entity.User, error) {
-	user, getUserError := userService.userRepository.ChangePassword(request)
+func (userService *UserService) ChangePassword(request Request.ChangePasswordRequest, userId string) (Entity.User, error) {
+	user, getUserError := userService.userRepository.ChangePassword(request, userId)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
 	}
@@ -97,8 +73,8 @@ func (userService *UserService) ChangePassword(request Request.ChangePasswordReq
 	return user, nil
 }
 
-func (userService *UserService) ChangeActiveStatus(request Request.ChangeStatusRequest) (Entity.User, error) {
-	user, getUserError := userService.userRepository.ChangeActiveStatus(request.ID)
+func (userService *UserService) ChangeActiveStatus(userId string) (Entity.User, error) {
+	user, getUserError := userService.userRepository.ChangeActiveStatus(userId)
 	if getUserError != nil {
 		return Entity.User{}, getUserError
 	}

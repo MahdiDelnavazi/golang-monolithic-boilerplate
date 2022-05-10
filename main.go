@@ -9,6 +9,17 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Router"
 )
 
+// @title                       Golang Monolithic Boilerplate
+// @version                     1.0
+// @description                 Golang Monolithic Boilerplate
+// @contact.name                Supnex
+// @contact.url                 https://supne.com/
+// @contact.email               team@supnex.com
+// @securityDefinitions.apikey  ApiKeyAuth
+// @in                          header
+// @name                        Authorization
+// @host                        localhost:3000
+// @BasePath                    /api/v1
 func main() {
 
 	// =====================================================

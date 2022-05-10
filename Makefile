@@ -23,4 +23,7 @@ server:
 	go run main.go
 
 
-.PHONY: postgres createdb dropdb migrateup migratedown test server redis
+swagger:
+	docker run --rm -it --env GOPATH=/go -v GOPATH/go/src -w /go/src quay.io/goswagger/swagger
+
+.PHONY: postgres createdb dropdb migrateup migratedown test server redis swagger

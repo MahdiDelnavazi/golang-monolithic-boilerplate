@@ -146,31 +146,6 @@ func TestUserRepository_GetUserByUsername(t *testing.T) {
 	require.Equal(t, user.IsActive, getUser.IsActive)
 }
 
-func TestUserRepository_LoginUser(t *testing.T) {
-
-	password := Helper.RandomString(8)
-	username := Helper.RandomString(5)
-	hashedPassword, err := Helper.HashPassword(password)
-	require.Nil(t, err)
-	require.NoError(t, err)
-
-	// first we create new user then we read it from db and test login
-	creatUserRequest := Request.CreateUserRequest{UserName: username, Password: hashedPassword}
-
-	user, err := repo.CreateUser(creatUserRequest)
-	require.NoError(t, err)
-	require.NotEmpty(t, user)
-	require.Equal(t, creatUserRequest.UserName, user.UserName)
-
-	loginRequest := Request.LoginUserRequest{UserName: username, Password: password}
-	login, loginErr := repo.LoginUser(loginRequest)
-	require.NoError(t, loginErr)
-	require.NotEmpty(t, login)
-	require.NotNil(t, login)
-	require.Equal(t, login.UserName, user.UserName)
-
-}
-
 func TestUserRepository_UpdateUser(t *testing.T) {
 
 	password := Helper.RandomString(8)

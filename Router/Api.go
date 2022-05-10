@@ -11,6 +11,10 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Components/Ticket"
 	User "github.com/mahdidl/golang_boilerplate/Components/User"
 	"github.com/mahdidl/golang_boilerplate/Components/UserRole"
+	"github.com/mahdidl/golang_boilerplate/docs"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"net/http"
 )
@@ -18,6 +22,7 @@ import (
 const (
 	prefix               = "/api/v1"
 	userPrefix           = "/user"
+	usersPrefix          = "/users"
 	ticketPrefix         = "/ticket"
 	authenticationPrefix = "/auth"
 	permissionPrefix     = "/permission"
@@ -30,11 +35,15 @@ func Routes(app *gin.Engine) {
 	router := app.Group(prefix)
 	routerTicket := app.Group(prefix + ticketPrefix)
 	routerUser := app.Group(prefix + userPrefix)
+	routerUsers := app.Group(prefix + usersPrefix)
 	authUser := app.Group(prefix + authenticationPrefix)
 	authPermission := app.Group(prefix + permissionPrefix)
 	authRole := app.Group(prefix + rolePrefix)
 	RolePermissionRouter := app.Group(prefix + rolePermissionPrefix)
 	UserRoleRouter := app.Group(prefix + userRolePrefix)
+
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -54,7 +63,8 @@ func Routes(app *gin.Engine) {
 	newTicketService := Ticket.NewTicketService(newUserService, newTicketRepository)
 	newTicketController := Ticket.NewTicketController(newTicketService)
 
-	newAuthService := Auth.NewAuthService()
+	newAuthRepository := Auth.NewAuthRepository()
+	newAuthService := Auth.NewAuthService(newAuthRepository)
 	newAuthController := Auth.NewAuthController(newAuthService)
 
 	newPermissionRepository := Permission.NewPermissionRepository()
@@ -76,6 +86,7 @@ func Routes(app *gin.Engine) {
 	// implement middleware to routes
 	authTicketRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
 	authUserRoutes := routerUser.Group("/").Use(Middleware.AuthMiddleware())
+	authUsersRoutes := routerUsers.Group("/").Use(Middleware.AuthMiddleware())
 	authPermissionRoutes := authPermission.Group("/").Use(Middleware.AuthMiddleware())
 	authRoleRoutes := authRole.Group("/").Use(Middleware.AuthMiddleware())
 	RolePermissionRoutes := RolePermissionRouter.Group("/").Use(Middleware.AuthMiddleware())
@@ -83,21 +94,26 @@ func Routes(app *gin.Engine) {
 
 	// user endpoints without auth
 	routerUser.POST("/create", newUserController.CreateUser)
-	routerUser.POST("/login", newUserController.LoginUser)
-	routerUser.POST("/logout", newAuthUserController.Logout)
+	routerUser.POST("/login", newAuthController.LoginUser)
 
+	//done
+	authUser.POST("/logout", newAuthUserController.Logout)
+
+	//	done
 	// user endpoints with auth
-	authUserRoutes.GET("/get_all", newUserController.GetAllUsers)
-	authUserRoutes.GET("/", newUserController.GetUserById)
-	authUserRoutes.PATCH("/", newUserController.UpdateUser)
-	authUserRoutes.PATCH("/change_password", newUserController.ChangePassword)
-	authUserRoutes.PATCH("/change_status", newUserController.ChangeActiveStatus)
+	authUsersRoutes.GET("/", newUserController.GetAllUsers)
+	authUserRoutes.GET("/:userId", newUserController.GetUserById)
+	authUserRoutes.PATCH("/:userId", newUserController.UpdateUser)
+	authUserRoutes.PUT("/change-password/:userId", newUserController.ChangePassword)
+	authUserRoutes.PATCH("/change-status/:userId", newUserController.ChangeActiveStatus)
 
+	// done
 	// authUser endpoints
 	authUser.POST("/newToken", newAuthController.AccessToken)
 
+	//	done
 	// ticket endpoints with auth
-	authTicketRoutes.POST("/create", newTicketController.CreateTicket)
+	authTicketRoutes.POST("/create/:userId", newTicketController.CreateTicket)
 
 	// permission endpoints with auth
 	// todo: remove create permission
@@ -108,13 +124,13 @@ func Routes(app *gin.Engine) {
 	// create role
 	authRoleRoutes.POST("/create", newRoleController.CreateRole)
 	// get all roles
-	authRoleRoutes.GET("/get_all", newRoleController.GetAllRoles)
+	authRoleRoutes.GET("/get-all", newRoleController.GetAllRoles)
 	// get role with id
-	authRoleRoutes.GET("/", newRoleController.GetRole)
+	authRoleRoutes.GET("/:roleId", newRoleController.GetRole)
 	// update role with id
-	authRoleRoutes.PATCH("/", newRoleController.UpdateRole)
+	authRoleRoutes.PATCH("/:roleId", newRoleController.UpdateRole)
 	// delete role with id
-	authRoleRoutes.DELETE("/", newRoleController.DeleteRole)
+	authRoleRoutes.DELETE("/:roleId", newRoleController.DeleteRole)
 
 	// attach permission to role with roleId and permissionId
 	RolePermissionRoutes.PATCH("/attach", newRolePermissionController.Attach)
