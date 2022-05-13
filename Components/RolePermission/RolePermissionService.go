@@ -2,7 +2,6 @@ package RolePermission
 
 import (
 	Entity "github.com/mahdidl/golang_boilerplate/Components/Role/Entity"
-	"github.com/mahdidl/golang_boilerplate/Components/RolePermission/Request"
 )
 
 type RolePermissionService struct {
@@ -13,8 +12,8 @@ func NewRolePermissionService(rolePermissionRepository *RolePermissionRepository
 	return &RolePermissionService{RolePermissionRepository: rolePermissionRepository}
 }
 
-func (rolePermissionService RolePermissionService) Attach(request Request.AttachPermission) (Entity.Role, error) {
-	role, err := rolePermissionService.RolePermissionRepository.Attach(request)
+func (rolePermissionService RolePermissionService) Attach(roleId string, permissionId string) (Entity.Role, error) {
+	role, err := rolePermissionService.RolePermissionRepository.Attach(roleId, permissionId)
 	if err != nil {
 		return Entity.Role{}, err
 	}
@@ -22,8 +21,8 @@ func (rolePermissionService RolePermissionService) Attach(request Request.Attach
 	return role, nil
 }
 
-func (rolePermissionService RolePermissionService) Detach(request Request.DetachPermission) (Entity.Role, error) {
-	role, err := rolePermissionService.RolePermissionRepository.Detach(request)
+func (rolePermissionService RolePermissionService) Detach(roleId string, permissionId string) (Entity.Role, error) {
+	role, err := rolePermissionService.RolePermissionRepository.Detach(roleId, permissionId)
 	if err != nil {
 		return Entity.Role{}, err
 	}

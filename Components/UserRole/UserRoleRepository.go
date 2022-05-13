@@ -5,7 +5,6 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Common/Config"
 	RoleEntity "github.com/mahdidl/golang_boilerplate/Components/Role/Entity"
 	"github.com/mahdidl/golang_boilerplate/Components/UserRole/Entity"
-	Request "github.com/mahdidl/golang_boilerplate/Components/UserRole/Request"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,28 +18,28 @@ func NewUserRoleRepository() *UserRoleRepository {
 	return &UserRoleRepository{}
 }
 
-func (rolePermissionRepository UserRoleRepository) Attach(request Request.AttachRole) (Entity.UserRole, error) {
+func (rolePermissionRepository UserRoleRepository) Attach(userId string, roleId string) (Entity.UserRole, error) {
 	var role RoleEntity.Role
 	var user Entity.UserRole
 
-	UserId, err := primitive.ObjectIDFromHex(request.UserId)
+	objectUserId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return Entity.UserRole{}, errors.New("invalid user id")
 	}
-	RoleId, err := primitive.ObjectIDFromHex(request.RoleId)
+	objectRoleId, err := primitive.ObjectIDFromHex(roleId)
 	if err != nil {
 		return Entity.UserRole{}, errors.New("invalid role id")
 	}
 
-	if err = Config.RoleCollection.FindOne(Config.DBCtx, bson.M{"_id": RoleId}).Decode(&role); err != nil {
+	if err = Config.RoleCollection.FindOne(Config.DBCtx, bson.M{"_id": objectRoleId}).Decode(&role); err != nil {
 		return Entity.UserRole{}, errors.New("role not found")
 	}
 
 	update := bson.D{
-		{"$set", bson.D{{"RoleId", RoleId}, {"UpdatedAt", time.Now()}}},
+		{"$set", bson.D{{"RoleId", objectRoleId}, {"UpdatedAt", time.Now()}}},
 	}
 
-	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": UserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": objectUserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if resultErr != nil {
 		return Entity.UserRole{}, resultErr
 	}
@@ -48,10 +47,10 @@ func (rolePermissionRepository UserRoleRepository) Attach(request Request.Attach
 	return user, nil
 }
 
-func (rolePermissionRepository UserRoleRepository) Detach(request Request.DetachRole) (Entity.UserRole, error) {
+func (rolePermissionRepository UserRoleRepository) Detach(userId string) (Entity.UserRole, error) {
 	var user Entity.UserRole
 
-	userId, err := primitive.ObjectIDFromHex(request.UserId)
+	objectUserId, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return Entity.UserRole{}, errors.New("invalid user id")
 	}
@@ -59,7 +58,7 @@ func (rolePermissionRepository UserRoleRepository) Detach(request Request.Detach
 		{"$set", bson.D{{"RoleId", nil}, {"UpdatedAt", time.Now()}}},
 	}
 
-	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": userId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": objectUserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if resultErr != nil {
 
 		return Entity.UserRole{}, resultErr

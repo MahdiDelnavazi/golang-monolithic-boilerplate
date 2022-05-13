@@ -75,7 +75,7 @@ func (userControler *UserController) CreateUser(context *gin.Context) {
 // @Success      200                {object}  Response.GeneralResponse{data=UserResponse.ResponseAllUsers}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "when user not exist or password is incorrect"
 // @Failure      401                {object}  Response.GeneralResponse{data=object} "unauthorized"
-// @Router       /users/ [get]
+// @Router       /user/ [get]
 // @Security ApiKeyAuth
 //
 // GetAllUsers return all users with pagination
@@ -116,7 +116,6 @@ func (userController *UserController) GetAllUsers(context *gin.Context) {
 //
 // GetUserById return user with id
 func (userController *UserController) GetUserById(context *gin.Context) {
-	//var userRequest Request.GetUser
 	userId := context.Param("userId")
 
 	validationErr := primitive.IsValidObjectID(userId)
@@ -148,7 +147,7 @@ func (userController *UserController) GetUserById(context *gin.Context) {
 // @Success      200                {object}  Response.GeneralResponse{data=Entity.User}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "when user not exist or id is incorrect"
 // @Failure      401                {object}  Response.GeneralResponse{data=object} "unauthorized"
-// @Router       /user/{userId} [patch]
+// @Router       /user/{userId} [put]
 // @Security ApiKeyAuth
 //
 // UpdateUser for update user with any params that client sends
@@ -194,7 +193,7 @@ func (userController *UserController) UpdateUser(context *gin.Context) {
 // @Success      200                {object}  Response.GeneralResponse{data=Entity.User}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "when user not exist or id is incorrect"
 // @Failure      401                {object}  Response.GeneralResponse{data=object} "unauthorized"
-// @Router       /user/change-status/{userId} [patch]
+// @Router       /user/{userId} [patch]
 // @Security ApiKeyAuth
 //
 // ChangeActiveStatus for changing active and deactivate user
@@ -230,7 +229,7 @@ func (userController *UserController) ChangeActiveStatus(context *gin.Context) {
 // @Success      200                {object}  Response.GeneralResponse{data=Entity.User}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "when user not exist or id is incorrect or password in incorrect"
 // @Failure      401                {object}  Response.GeneralResponse{data=object} "unauthorized"
-// @Router       /user/change-password/{userId} [put]
+// @Router       /user/{userId}/password [put]
 // @Security ApiKeyAuth
 //
 // ChangeActiveStatus for changing active and deactivate user

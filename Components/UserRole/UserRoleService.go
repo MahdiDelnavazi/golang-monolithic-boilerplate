@@ -2,7 +2,6 @@ package UserRole
 
 import (
 	"github.com/mahdidl/golang_boilerplate/Components/UserRole/Entity"
-	Request "github.com/mahdidl/golang_boilerplate/Components/UserRole/Request"
 )
 
 type UserRoleService struct {
@@ -13,8 +12,8 @@ func NewUserRoleService(userRoleRepository *UserRoleRepository) *UserRoleService
 	return &UserRoleService{userRoleRepository: userRoleRepository}
 }
 
-func (userRoleService UserRoleService) AttachRole(request Request.AttachRole) (Entity.UserRole, error) {
-	role, err := userRoleService.userRoleRepository.Attach(request)
+func (userRoleService UserRoleService) AttachRole(userId string, roleId string) (Entity.UserRole, error) {
+	role, err := userRoleService.userRoleRepository.Attach(userId, roleId)
 	if err != nil {
 		return Entity.UserRole{}, err
 	}
@@ -22,8 +21,8 @@ func (userRoleService UserRoleService) AttachRole(request Request.AttachRole) (E
 	return role, nil
 }
 
-func (userRoleService UserRoleService) DetachRole(request Request.DetachRole) (Entity.UserRole, error) {
-	role, err := userRoleService.userRoleRepository.Detach(request)
+func (userRoleService UserRoleService) DetachRole(userId string) (Entity.UserRole, error) {
+	role, err := userRoleService.userRoleRepository.Detach(userId)
 	if err != nil {
 		return Entity.UserRole{}, err
 	}

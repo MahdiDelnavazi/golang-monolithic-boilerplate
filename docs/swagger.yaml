@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  Entity.Permission:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   Entity.Role:
     properties:
       createdAt:
@@ -48,6 +55,14 @@ definitions:
     - currentPassword
     - newPassword
     type: object
+  Request.CreatePermission:
+    properties:
+      Name:
+        minLength: 3
+        type: string
+    required:
+    - Name
+    type: object
   Request.CreateRole:
     properties:
       Name:
@@ -73,6 +88,13 @@ definitions:
     required:
     - password
     - username
+    type: object
+  Request.UpdateRole:
+    properties:
+      Name:
+        type: string
+    required:
+    - Name
     type: object
   Request.UpdateUserRequest:
     properties:
@@ -147,7 +169,7 @@ info:
   version: "1.0"
 paths:
   /auth/logout:
-    post:
+    delete:
       consumes:
       - application/json
       description: Logout user with access token
@@ -218,17 +240,18 @@ paths:
       summary: New access token
       tags:
       - Auth
-  /role/{roleId}:
+  /permission:
     get:
       consumes:
       - application/json
-      description: Get role
+      description: Get permission
       parameters:
-      - description: get role with id
-        in: path
-        name: GetRolRequest
-        required: true
-        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -239,10 +262,10 @@ paths:
             - $ref: '#/definitions/Response.GeneralResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/Response.GetRole'
+                  $ref: '#/definitions/Entity.Permission'
               type: object
         "400":
-          description: get role
+          description: Bad Request
           schema:
             allOf:
             - $ref: '#/definitions/Response.GeneralResponse'
@@ -252,21 +275,62 @@ paths:
               type: object
       security:
       - ApiKeyAuth: []
-      summary: Get role
+      summary: Get permission
       tags:
-      - Role
-  /role/create:
+      - Permission
     post:
       consumes:
       - application/json
-      description: Create role
+      description: Create permission
       parameters:
-      - description: Create role request
+      - description: Create permission request
         in: body
-        name: CreateRoleRequest
+        name: createPermissionRequest
         required: true
         schema:
-          $ref: '#/definitions/Request.CreateRole'
+          $ref: '#/definitions/Request.CreatePermission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.Permission'
+              type: object
+        "400":
+          description: name should have more than 3 character
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create permission
+      tags:
+      - Permission
+  /role-permission/attach/{roleId}{permissionId}:
+    patch:
+      consumes:
+      - application/json
+      description: Attach permission to role with roleId and permissionId
+      parameters:
+      - description: roleId
+        in: path
+        name: roleId
+        required: true
+        type: string
+      - description: permissionId
+        in: path
+        name: permissionId
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -280,7 +344,7 @@ paths:
                   $ref: '#/definitions/Entity.Role'
               type: object
         "400":
-          description: create role
+          description: Bad Request
           schema:
             allOf:
             - $ref: '#/definitions/Response.GeneralResponse'
@@ -290,10 +354,52 @@ paths:
               type: object
       security:
       - ApiKeyAuth: []
-      summary: Create role
+      summary: Attach permission to role
       tags:
-      - Role
-  /role/get-all:
+      - Role-Permission
+  /role-permission/detach/{roleId}{permissionId}:
+    patch:
+      consumes:
+      - application/json
+      description: Detach permission from role with roleId and permissionId
+      parameters:
+      - description: roleId
+        in: path
+        name: roleId
+        required: true
+        type: string
+      - description: permissionId
+        in: path
+        name: permissionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.Role'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Detach permission from role
+      tags:
+      - Role-Permission
+  /role/:
     get:
       consumes:
       - application/json
@@ -331,6 +437,320 @@ paths:
       summary: Create role
       tags:
       - Role
+    post:
+      consumes:
+      - application/json
+      description: Create role
+      parameters:
+      - description: Create role request
+        in: body
+        name: CreateRoleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.Role'
+              type: object
+        "400":
+          description: create role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create role
+      tags:
+      - Role
+  /role/{roleId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete role
+      parameters:
+      - description: delete role with id
+        in: path
+        name: roleId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.GetRole'
+              type: object
+        "400":
+          description: get role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete role
+      tags:
+      - Role
+    get:
+      consumes:
+      - application/json
+      description: Get role
+      parameters:
+      - description: get role with id
+        in: path
+        name: roleId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.GetRole'
+              type: object
+        "400":
+          description: get role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get role
+      tags:
+      - Role
+    patch:
+      consumes:
+      - application/json
+      description: Get role
+      parameters:
+      - description: update role with id
+        in: path
+        name: roleId
+        required: true
+        type: string
+      - description: update role model
+        in: body
+        name: UpdateRole
+        required: true
+        schema:
+          $ref: '#/definitions/Request.UpdateRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.GetRole'
+              type: object
+        "400":
+          description: get role
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get role
+      tags:
+      - Role
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: Create user request
+        in: body
+        name: CreateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user exist or password < 8 character
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Create user
+      tags:
+      - User
+  /user-role/attach/{roleId}{userId}:
+    patch:
+      consumes:
+      - application/json
+      description: Atttach role to user with roleId and userId
+      parameters:
+      - description: roleId
+        in: path
+        name: roleId
+        required: true
+        type: string
+      - description: userId
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Atttach role from user
+      tags:
+      - User-Role
+  /user-role/detach/{userId}:
+    patch:
+      consumes:
+      - application/json
+      description: Dettach role from user with roleId and userId
+      parameters:
+      - description: userId
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Dettach role from user
+      tags:
+      - User-Role
+  /user/:
+    get:
+      consumes:
+      - application/json
+      description: Get all users return all users with pagination
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.ResponseAllUsers'
+              type: object
+        "400":
+          description: when user not exist or password is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get all users
+      tags:
+      - User
   /user/{userId}:
     get:
       consumes:
@@ -378,6 +798,51 @@ paths:
       tags:
       - User
     patch:
+      consumes:
+      - application/json
+      description: Change user active status with id
+      parameters:
+      - description: user id
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.User'
+              type: object
+        "400":
+          description: when user not exist or id is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: unauthorized
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Change user active status
+      tags:
+      - User
+    put:
       consumes:
       - application/json
       description: Update user change user fields and return user
@@ -428,7 +893,7 @@ paths:
       summary: Update user
       tags:
       - User
-  /user/change-password/{userId}:
+  /user/{userId}/password:
     put:
       consumes:
       - application/json
@@ -478,135 +943,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Change user password
-      tags:
-      - User
-  /user/change-status/{userId}:
-    patch:
-      consumes:
-      - application/json
-      description: Change user active status with id
-      parameters:
-      - description: user id
-        in: path
-        name: userId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Entity.User'
-              type: object
-        "400":
-          description: when user not exist or id is incorrect
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-        "401":
-          description: unauthorized
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Change user active status
-      tags:
-      - User
-  /user/create:
-    post:
-      consumes:
-      - application/json
-      description: Create user
-      parameters:
-      - description: Create user request
-        in: body
-        name: CreateUserRequest
-        required: true
-        schema:
-          $ref: '#/definitions/Request.CreateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Entity.User'
-              type: object
-        "400":
-          description: when user exist or password < 8 character
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-      summary: Create user
-      tags:
-      - User
-  /user/get-all:
-    get:
-      consumes:
-      - application/json
-      description: Get all users return all users with pagination
-      parameters:
-      - in: query
-        name: limit
-        type: integer
-      - in: query
-        name: page
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Response.ResponseAllUsers'
-              type: object
-        "400":
-          description: when user not exist or password is incorrect
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-        "401":
-          description: unauthorized
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Get all users
       tags:
       - User
   /user/login:

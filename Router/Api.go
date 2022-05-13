@@ -12,35 +12,32 @@ import (
 	User "github.com/mahdidl/golang_boilerplate/Components/User"
 	"github.com/mahdidl/golang_boilerplate/Components/UserRole"
 	"github.com/mahdidl/golang_boilerplate/docs"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 
-	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/files"       // swagger embed files
+	"github.com/swaggo/gin-swagger" // gin-swagger middleware
 
 	"net/http"
 )
 
 const (
-	prefix               = "/api/v1"
-	userPrefix           = "/user"
-	usersPrefix          = "/users"
-	ticketPrefix         = "/ticket"
-	authenticationPrefix = "/auth"
-	permissionPrefix     = "/permission"
-	rolePrefix           = "/role"
-	rolePermissionPrefix = "/role_permission"
-	userRolePrefix       = "/user_role"
+	prefix                = "/api/v1"
+	usersPostfix          = "/user"
+	ticketPostfix         = "/ticket"
+	authenticationPostfix = "/authentication"
+	permissionPostfix     = "/permission"
+	rolePostfix           = "/role"
+	rolePermissionPostfix = "/role-permission"
+	userRolePostfix       = "/user-role"
 )
 
 func Routes(app *gin.Engine) {
 	router := app.Group(prefix)
-	routerTicket := app.Group(prefix + ticketPrefix)
-	routerUser := app.Group(prefix + userPrefix)
-	routerUsers := app.Group(prefix + usersPrefix)
-	authUser := app.Group(prefix + authenticationPrefix)
-	authPermission := app.Group(prefix + permissionPrefix)
-	authRole := app.Group(prefix + rolePrefix)
-	RolePermissionRouter := app.Group(prefix + rolePermissionPrefix)
-	UserRoleRouter := app.Group(prefix + userRolePrefix)
+	//routerTicket := app.Group(prefix + ticketPostfix)
+	//authUser := app.Group(prefix + authenticationPostfix)
+	//authPermission := app.Group(prefix + permissionPostfix)
+	//authRole := app.Group(prefix + rolePostfix)
+	//RolePermissionRouter := app.Group(prefix + rolePermissionPostfix)
+	//UserRoleRouter := app.Group(prefix + userRolePostfix)
 
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -51,97 +48,111 @@ func Routes(app *gin.Engine) {
 		})
 	})
 
-	newUserRepository := User.NewUserRepository()
-	newUserService := User.NewUserService(newUserRepository)
-	newUserController := User.NewUserController(newUserService)
+	userRepository := User.NewUserRepository()
+	userService := User.NewUserService(userRepository)
+	userController := User.NewUserController(userService)
+	userRouter := router.Group(usersPostfix).Use(Middleware.AuthMiddleware())
+	{
+		// Get Requests
+		userRouter.GET("", userController.GetAllUsers)
+		userRouter.GET("/:userId", userController.GetUserById)
 
-	newAuthUserRepository := AuthUser.NewAuthUserRepository()
-	newAuthUserService := AuthUser.NewAuthUserService(newAuthUserRepository)
-	newAuthUserController := AuthUser.NewAuthUserController(newAuthUserService)
+		// Put Requests
+		userRouter.PUT("/:userId", userController.UpdateUser)
+		userRouter.PUT("/:userId/password", userController.ChangePassword)
 
-	newTicketRepository := Ticket.NewTicketRepository()
-	newTicketService := Ticket.NewTicketService(newUserService, newTicketRepository)
-	newTicketController := Ticket.NewTicketController(newTicketService)
+		// Patch Requests
+		userRouter.PATCH("/:userId", userController.ChangeActiveStatus)
+	}
+	userRouter = router.Group(usersPostfix)
+	{
+		userRouter.POST("/create", userController.CreateUser)
+	}
 
-	newAuthRepository := Auth.NewAuthRepository()
-	newAuthService := Auth.NewAuthService(newAuthRepository)
-	newAuthController := Auth.NewAuthController(newAuthService)
+	authUserRepository := AuthUser.NewAuthUserRepository()
+	authUserService := AuthUser.NewAuthUserService(authUserRepository)
+	authUserController := AuthUser.NewAuthUserController(authUserService)
 
-	newPermissionRepository := Permission.NewPermissionRepository()
-	newPermissionService := Permission.NewPermissionService(newPermissionRepository)
-	newPermissionController := Permission.NewPermissionController(newPermissionService)
+	authRepository := Auth.NewAuthRepository()
+	authService := Auth.NewAuthService(authRepository)
+	authController := Auth.NewAuthController(authService)
 
-	newRoleRepository := Role.NewRoleRepository()
-	newRoleService := Role.NewRoleService(newRoleRepository)
-	newRoleController := Role.NewRoleController(newRoleService)
+	authUserRouter := router.Group(authenticationPostfix).Use(Middleware.AuthMiddleware())
+	{
+		// Post Request
+		authUserRouter.POST("/newToken", authController.AccessToken)
 
-	newRolePermissionRepository := RolePermission.NewRolePermissionRepository()
-	newRolePermissionService := RolePermission.NewRolePermissionService(newRolePermissionRepository)
-	newRolePermissionController := RolePermission.NewRolePermissionController(newRolePermissionService)
+		// Delete Requests
+		authUserRouter.DELETE("/logout", authUserController.Logout)
+	}
+	authUserRouter = router.Group(authenticationPostfix).Use()
+	authUserRouter.POST("/login", authController.LoginUser)
 
-	newUserRoleRepository := UserRole.NewUserRoleRepository()
-	newUserRoleService := UserRole.NewUserRoleService(newUserRoleRepository)
-	newUserRoleController := UserRole.NewUserRoleController(newUserRoleService)
+	ticketRepository := Ticket.NewTicketRepository()
+	ticketService := Ticket.NewTicketService(userService, ticketRepository)
+	ticketController := Ticket.NewTicketController(ticketService)
+	tickerRouter := router.Group(ticketPostfix).Use(Middleware.AuthMiddleware())
+	{
+		// Post Requests
+		tickerRouter.POST("/create/:userId", ticketController.CreateTicket)
+	}
 
-	// implement middleware to routes
-	authTicketRoutes := routerTicket.Group("/").Use(Middleware.AuthMiddleware())
-	authUserRoutes := routerUser.Group("/").Use(Middleware.AuthMiddleware())
-	authUsersRoutes := routerUsers.Group("/").Use(Middleware.AuthMiddleware())
-	authPermissionRoutes := authPermission.Group("/").Use(Middleware.AuthMiddleware())
-	authRoleRoutes := authRole.Group("/").Use(Middleware.AuthMiddleware())
-	RolePermissionRoutes := RolePermissionRouter.Group("/").Use(Middleware.AuthMiddleware())
-	UserRoleRoutes := UserRoleRouter.Group("/").Use(Middleware.AuthMiddleware())
+	permissionRepository := Permission.NewPermissionRepository()
+	permissionService := Permission.NewPermissionService(permissionRepository)
+	permissionController := Permission.NewPermissionController(permissionService)
+	permissionRouter := router.Group(permissionPostfix).Use(Middleware.AuthMiddleware())
+	{
+		// todo: remove create permission
+		// Post Requests
+		permissionRouter.POST("/", permissionController.CreatePermission)
 
-	// user endpoints without auth
-	routerUser.POST("/create", newUserController.CreateUser)
-	routerUser.POST("/login", newAuthController.LoginUser)
+		// Get Requests
+		permissionRouter.GET("/", permissionController.GetPermissions)
+	}
 
-	//done
-	authUser.POST("/logout", newAuthUserController.Logout)
+	// todo implement REST
+	roleRepository := Role.NewRoleRepository()
+	roleService := Role.NewRoleService(roleRepository)
+	roleController := Role.NewRoleController(roleService)
+	roleRouter := router.Group(rolePostfix).Use(Middleware.AuthMiddleware())
+	{
+		// Post Requests
+		roleRouter.POST("/", roleController.CreateRole)
 
-	//	done
-	// user endpoints with auth
-	authUsersRoutes.GET("/", newUserController.GetAllUsers)
-	authUserRoutes.GET("/:userId", newUserController.GetUserById)
-	authUserRoutes.PATCH("/:userId", newUserController.UpdateUser)
-	authUserRoutes.PUT("/change-password/:userId", newUserController.ChangePassword)
-	authUserRoutes.PATCH("/change-status/:userId", newUserController.ChangeActiveStatus)
+		// Get Requests
+		roleRouter.GET("/", roleController.GetAllRoles)
+		roleRouter.GET("/:roleId", roleController.GetRole)
 
-	// done
-	// authUser endpoints
-	authUser.POST("/newToken", newAuthController.AccessToken)
+		roleRouter.PATCH("/:roleId", roleController.UpdateRole)
 
-	//	done
-	// ticket endpoints with auth
-	authTicketRoutes.POST("/create/:userId", newTicketController.CreateTicket)
+		roleRouter.DELETE("/:roleId", roleController.DeleteRole)
+	}
 
-	// permission endpoints with auth
-	// todo: remove create permission
-	authPermissionRoutes.POST("/create", newPermissionController.CreatePermission)
-	authPermissionRoutes.GET("/", newPermissionController.GetPermissions)
+	rolePermissionRepository := RolePermission.NewRolePermissionRepository()
+	rolePermissionService := RolePermission.NewRolePermissionService(rolePermissionRepository)
+	rolePermissionController := RolePermission.NewRolePermissionController(rolePermissionService)
+	rolePermissionRouter := router.Group(rolePermissionPostfix).Use(Middleware.AuthMiddleware())
+	{
+		// Patch Requests
+		// attach permission to role with roleId and permissionId
+		rolePermissionRouter.PATCH("/attach/:roleId/:permissionId", rolePermissionController.Attach)
 
-	// role endpoint with auth
-	// create role
-	authRoleRoutes.POST("/create", newRoleController.CreateRole)
-	// get all roles
-	authRoleRoutes.GET("/get-all", newRoleController.GetAllRoles)
-	// get role with id
-	authRoleRoutes.GET("/:roleId", newRoleController.GetRole)
-	// update role with id
-	authRoleRoutes.PATCH("/:roleId", newRoleController.UpdateRole)
-	// delete role with id
-	authRoleRoutes.DELETE("/:roleId", newRoleController.DeleteRole)
+		// detach permission from role with roleId and permissionId
+		rolePermissionRouter.PATCH("/detach/:roleId/:permissionId", rolePermissionController.Detach)
+	}
 
-	// attach permission to role with roleId and permissionId
-	RolePermissionRoutes.PATCH("/attach", newRolePermissionController.Attach)
+	userRoleRepository := UserRole.NewUserRoleRepository()
+	userRoleService := UserRole.NewUserRoleService(userRoleRepository)
+	userRoleController := UserRole.NewUserRoleController(userRoleService)
+	userRoleRouter := router.Group(userRolePostfix).Use(Middleware.AuthMiddleware())
+	{
+		// Patch Requests
+		// attach role to user with roleId and userId
+		userRoleRouter.PATCH("/attach/:roleId/:userId", userRoleController.Attach)
 
-	// detach permission from role with roleId and permissionId
-	RolePermissionRoutes.PATCH("/detach", newRolePermissionController.Detach)
+		// detach role from user with userId
+		userRoleRouter.PATCH("/detach/:userId", userRoleController.Detach)
 
-	// attach role to user with roleId and userId
-	UserRoleRoutes.PATCH("/attach", newUserRoleController.Attach)
-
-	// detach role from user with userId
-	UserRoleRoutes.PATCH("/detach", newUserRoleController.Detach)
+	}
 
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Common/Config"
 	PermissionEntity "github.com/mahdidl/golang_boilerplate/Components/Permission/Entity"
 	RoleEntity "github.com/mahdidl/golang_boilerplate/Components/Role/Entity"
-	"github.com/mahdidl/golang_boilerplate/Components/RolePermission/Request"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,16 +18,16 @@ func NewRolePermissionRepository() *RolePermissionRepository {
 	return &RolePermissionRepository{}
 }
 
-func (rolePermissionRepository RolePermissionRepository) Attach(request Request.AttachPermission) (RoleEntity.Role, error) {
+func (rolePermissionRepository RolePermissionRepository) Attach(roleId string, permissionId string) (RoleEntity.Role, error) {
 	var role RoleEntity.Role
 	var permission PermissionEntity.Permission
 
-	PermissionId, err := primitive.ObjectIDFromHex(request.PermissionId)
+	PermissionId, err := primitive.ObjectIDFromHex(permissionId)
 	if err = Config.PermissionCollection.FindOne(Config.DBCtx, bson.M{"_id": PermissionId}).Decode(&permission); err != nil {
 		return RoleEntity.Role{}, errors.New("permission not found")
 	}
 
-	RoleId, err := primitive.ObjectIDFromHex(request.RoleId)
+	RoleId, err := primitive.ObjectIDFromHex(roleId)
 
 	update := bson.M{
 		"$set": bson.M{
@@ -47,16 +46,16 @@ func (rolePermissionRepository RolePermissionRepository) Attach(request Request.
 	return role, nil
 }
 
-func (rolePermissionRepository RolePermissionRepository) Detach(request Request.DetachPermission) (RoleEntity.Role, error) {
+func (rolePermissionRepository RolePermissionRepository) Detach(roleId string, permissionId string) (RoleEntity.Role, error) {
 	var role RoleEntity.Role
 	var permission PermissionEntity.Permission
 
-	PermissionId, err := primitive.ObjectIDFromHex(request.PermissionId)
+	PermissionId, err := primitive.ObjectIDFromHex(permissionId)
 	if err = Config.PermissionCollection.FindOne(Config.DBCtx, bson.M{"_id": PermissionId}).Decode(&permission); err != nil {
 		return RoleEntity.Role{}, errors.New("permission not found")
 	}
 
-	RoleId, err := primitive.ObjectIDFromHex(request.RoleId)
+	RoleId, err := primitive.ObjectIDFromHex(roleId)
 
 	update := bson.M{
 		"$pull": bson.M{

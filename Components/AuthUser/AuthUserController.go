@@ -29,7 +29,7 @@ func NewAuthUserController(authUserService *AuthUserService) *AuthUserController
 // @Param        LogoutUserRequest  body      Request.LogoutRequest  true  "logout user"
 // @Success      200                {object}  Response.GeneralResponse{data=string}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "when access token is not valid"
-// @Router       /auth/logout [post]
+// @Router       /auth/logout [delete]
 //
 // Logout user with access token
 func (authUserController *AuthUserController) Logout(context *gin.Context) {

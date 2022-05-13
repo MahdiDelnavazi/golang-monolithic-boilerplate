@@ -29,7 +29,7 @@ func NewRoleController(service *RoleService) *RoleController {
 // @Param        CreateRoleRequest  body      Request.CreateRole  true  "Create role request"
 // @Success      200                {object}  Response.GeneralResponse{data=Entity.Role}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "create role"
-// @Router       /role/create [post]
+// @Router       /role/ [post]
 // @Security ApiKeyAuth
 //
 // CreateRole is a handler function which is creating role
@@ -75,7 +75,7 @@ func (roleController RoleController) CreateRole(context *gin.Context) {
 // @Param        GetAllRoleRequest  query      Request.GetAllRole  true  "get all roles with pagination"
 // @Success      200                {object}  Response.GeneralResponse{data=RoleResponse.GetAllRoles}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "create role"
-// @Router       /role/get-all [get]
+// @Router       /role/ [get]
 // @Security ApiKeyAuth
 //
 // GetAllRoles is a handler function which is return all roles with pagination
@@ -136,12 +136,35 @@ func (roleController *RoleController) GetRole(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
+// @Summary      Get role
+// @Description  Get role
+// @Tags         Role
+// @Accept       json
+// @Produce      json
+// @Param        roleId  path      string  true  "update role with id"
+// @Param        UpdateRole  body      Request.UpdateRole  true  "update role model"
+// @Success      200                {object}  Response.GeneralResponse{data=RoleResponse.GetRole}
+// @Failure      400                {object}  Response.GeneralResponse{data=object} "get role"
+// @Router       /role/{roleId} [patch]
+// @Security ApiKeyAuth
+//
+// UpdateRole for updating role name
 func (roleController *RoleController) UpdateRole(context *gin.Context) {
 	var request Request.UpdateRole
-	context.ShouldBindQuery(&request)
 	context.ShouldBindJSON(&request)
 
-	role, responseErr := roleController.RoleService.Update(request)
+	roleId := context.Param("roleId")
+
+	validationErr := primitive.IsValidObjectID(roleId)
+	fmt.Println("this is role id :", roleId, validationErr)
+
+	if !validationErr {
+		response := Response.GeneralResponse{Error: true, Message: "id is not valid"}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	role, responseErr := roleController.RoleService.Update(request, roleId)
 	if responseErr != nil {
 		response := Response.GeneralResponse{
 			Error: true, Message: responseErr.Error(),
@@ -154,11 +177,31 @@ func (roleController *RoleController) UpdateRole(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"response": response})
 }
 
+// @Summary      Delete role
+// @Description  Delete role
+// @Tags         Role
+// @Accept       json
+// @Produce      json
+// @Param        roleId  path      string  true  "delete role with id"
+// @Success      200                {object}  Response.GeneralResponse{data=RoleResponse.GetRole}
+// @Failure      400                {object}  Response.GeneralResponse{data=object} "get role"
+// @Router       /role/{roleId} [delete]
+// @Security ApiKeyAuth
+//
+// UpdateRole for updating role name
 func (roleController *RoleController) DeleteRole(context *gin.Context) {
-	var request Request.DeleteRole
-	context.ShouldBindQuery(&request)
+	roleId := context.Param("roleId")
 
-	_, responseErr := roleController.RoleService.Delete(request)
+	validationErr := primitive.IsValidObjectID(roleId)
+	fmt.Println("this is role id :", roleId, validationErr)
+
+	if !validationErr {
+		response := Response.GeneralResponse{Error: true, Message: "id is not valid"}
+		context.JSON(http.StatusBadRequest, gin.H{"response": response})
+		return
+	}
+
+	_, responseErr := roleController.RoleService.Delete(roleId)
 	if responseErr != nil {
 		response := Response.GeneralResponse{
 			Error: true, Message: responseErr.Error(),

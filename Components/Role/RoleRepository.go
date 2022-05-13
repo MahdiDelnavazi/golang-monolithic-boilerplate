@@ -72,10 +72,10 @@ func (roleRepository RoleRepository) GetRoleById(Id string) (Entity.Role, error)
 	return role, nil
 }
 
-func (roleRepository RoleRepository) Update(request Request.UpdateRole) (Entity.Role, error) {
+func (roleRepository RoleRepository) Update(request Request.UpdateRole, roleId string) (Entity.Role, error) {
 	var role Entity.Role
 
-	id1, err := primitive.ObjectIDFromHex(request.Id)
+	id1, err := primitive.ObjectIDFromHex(roleId)
 	if err != nil {
 		return Entity.Role{}, fmt.Errorf("id is not valid")
 	}
@@ -91,10 +91,10 @@ func (roleRepository RoleRepository) Update(request Request.UpdateRole) (Entity.
 	return role, result
 }
 
-func (roleRepository RoleRepository) Delete(request Request.DeleteRole) (Entity.Role, error) {
+func (roleRepository RoleRepository) Delete(roleId string) (Entity.Role, error) {
 	var role Entity.Role
 
-	id1, err := primitive.ObjectIDFromHex(request.Id)
+	id1, err := primitive.ObjectIDFromHex(roleId)
 	if err != nil {
 		return Entity.Role{}, fmt.Errorf("id is not valid")
 	}

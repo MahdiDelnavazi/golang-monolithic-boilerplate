@@ -42,8 +42,8 @@ func (roleService *RoleService) GetRoleById(Id string) (Response.GetRole, error)
 	return Response.GetRole{Roles: roles}, nil
 }
 
-func (roleService *RoleService) Update(request Request.UpdateRole) (Response.GetRole, error) {
-	role, err := roleService.roleRepository.Update(request)
+func (roleService *RoleService) Update(request Request.UpdateRole, roleId string) (Response.GetRole, error) {
+	role, err := roleService.roleRepository.Update(request, roleId)
 	if err != nil {
 		return Response.GetRole{}, err
 	}
@@ -51,8 +51,8 @@ func (roleService *RoleService) Update(request Request.UpdateRole) (Response.Get
 	return Response.GetRole{Roles: role}, nil
 }
 
-func (roleService *RoleService) Delete(request Request.DeleteRole) (Response.GetRole, error) {
-	role, err := roleService.roleRepository.Delete(request)
+func (roleService *RoleService) Delete(roleId string) (Response.GetRole, error) {
+	role, err := roleService.roleRepository.Delete(roleId)
 	if err != nil {
 		return Response.GetRole{}, err
 	}
