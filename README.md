@@ -32,21 +32,21 @@ Golang Monolithic Boilerplate using Domain Driven Design handles authentication 
    │
    ├───────▶ Components ─ ─ ─ ─ All Components have Request ,Response ,Controller ,Service and Repository
    │                   │ 
-   │                   └──┬──▶ Auth ─ ─ ─ ─ ─ Database Stored Procedures
+   │                   └──┬──▶ Auth ─ ─ ─ ─ Login User and NewAccessToken
    │                      │
-   │                      ├──▶ AuthUser 
+   │                      ├──▶ AuthUser ─ ─ ─ ─ Logout User
    │                      │ 
-   │                      ├──▶ Permission
+   │                      ├──▶ Permission ─ ─ ─ ─ Permission List
    │                      │
-   │                      ├──▶ Role
+   │                      ├──▶ Role ─ ─ ─ ─ Create ,Reade ,Update Roles
    │                      │
-   │                      ├──▶ RolePermission
+   │                      ├──▶ RolePermission ─ ─ ─ ─ Attach and Detach Permission to Role
    │                      │
-   │                      ├──▶ Ticket
+   │                      ├──▶ Ticket ─ ─ ─ ─ Create New User Ticket
    │                      │
-   │                      ├──▶ User
+   │                      ├──▶ User ─ ─ ─ ─ Create ,Reade ,Update User 
    │                      │
-   │                      └──▶ UserRole
+   │                      └──▶ UserRole ─ ─ ─ ─ Attach and Detach Role to User
    │
    ├───────▶ Docs ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Swagger Files
    │
