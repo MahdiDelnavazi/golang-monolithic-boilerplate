@@ -1,7 +1,12 @@
 
 # Golang Monolithic Boilerplate
 
-Golang Monolithic Boilerplate using Domain Driven Design handles authentication and authorization , and beside of this features, It also handles user CRUD.
+Golang Monolithic Boilerplate using Domain Driven Design handles authentication and authorization, and beside of this features, It also handles user CRUD using :
+* [**Gin Gonic**](https://github.com/gin-gonic/gin)
+* [**MongoDB**](https://www.mongodb.com)
+* [**Redis**](https://redis.io)
+* [**Docker**](https://www.docker.com)
+* [**Paseto**](https://paseto.io)
 
 ## Terminology
 
@@ -25,7 +30,23 @@ Golang Monolithic Boilerplate using Domain Driven Design handles authentication 
    │
    ├───────▶ Common ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Configuration(s) (default values, env, middleware, token)
    │
-   ├───────▶ Components ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
+   ├───────▶ Components ─ ─ ─ ─ All Components have Request ,Response ,Controller ,Service and Repository
+   │                   │ 
+   │                   └──┬──▶ Auth ─ ─ ─ ─ ─ Database Stored Procedures
+   │                      │
+   │                      ├──▶ AuthUser 
+   │                      │ 
+   │                      ├──▶ Permission
+   │                      │
+   │                      ├──▶ Role
+   │                      │
+   │                      ├──▶ RolePermission
+   │                      │
+   │                      ├──▶ Ticket
+   │                      │
+   │                      ├──▶ User
+   │                      │
+   │                      └──▶ UserRole
    │
    ├───────▶ Docs ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ Swagger Files
    │
