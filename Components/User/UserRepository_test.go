@@ -58,10 +58,10 @@ func TestUserRepository_ChangePassword(t *testing.T) {
 
 	rand.Seed(time.Now().UnixNano())
 	userId := user.ID.Hex()
-	ChangePassword := Request.ChangePasswordRequest{Id: userId, CurrentPassword: password, NewPassword: Helper.RandomString(8)}
+	ChangePassword := Request.ChangePasswordRequest{CurrentPassword: password, NewPassword: Helper.RandomString(8)}
 	require.NotNil(t, repo)
 
-	userChangedPass, err := repo.ChangePassword(ChangePassword)
+	userChangedPass, err := repo.ChangePassword(ChangePassword, userId)
 	require.NoError(t, err)
 	require.NotEmpty(t, user)
 	require.Equal(t, user.UserName, userChangedPass.UserName)
@@ -162,8 +162,8 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	require.NotEmpty(t, user)
 	require.Equal(t, creatUserRequest.UserName, user.UserName)
 
-	updateRequest := Request.UpdateUserRequest{ID: user.ID.Hex(), UserName: Helper.RandomString(5)}
-	updatedUser, updateErr := repo.UpdateUser(updateRequest)
+	updateRequest := Request.UpdateUserRequest{UserName: Helper.RandomString(5)}
+	updatedUser, updateErr := repo.UpdateUser(updateRequest, user.ID.Hex())
 	require.NoError(t, updateErr)
 	require.NotNil(t, updatedUser)
 	require.NotEmpty(t, updatedUser)

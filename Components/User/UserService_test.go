@@ -37,8 +37,7 @@ func TestUserService_ChangeActiveStatus(t *testing.T) {
 	require.Equal(t, userResponse.UserName, userRequest.UserName)
 	require.True(t, userResponse.IsActive)
 
-	changeStatusRequest := Request.ChangeStatusRequest{ID: userResponse.ID.Hex()}
-	changeStatusResponse, err := userService.ChangeActiveStatus(changeStatusRequest)
+	changeStatusResponse, err := userService.ChangeActiveStatus(userResponse.ID.Hex())
 	require.NoError(t, err)
 	require.NotEmpty(t, changeStatusResponse)
 	require.NotNil(t, changeStatusResponse)
@@ -56,8 +55,8 @@ func TestUserService_ChangePassword(t *testing.T) {
 	require.NotNil(t, userResponse)
 	require.Equal(t, userResponse.UserName, userRequest.UserName)
 
-	changePassRequest := Request.ChangePasswordRequest{Id: userResponse.ID.Hex(), CurrentPassword: password, NewPassword: Helper.RandomString(8)}
-	changePassResponse, err := userService.ChangePassword(changePassRequest)
+	changePassRequest := Request.ChangePasswordRequest{CurrentPassword: password, NewPassword: Helper.RandomString(8)}
+	changePassResponse, err := userService.ChangePassword(changePassRequest, userResponse.ID.Hex())
 
 	require.NoError(t, err)
 	require.Equal(t, changePassResponse.ID, userResponse.ID)
@@ -116,8 +115,7 @@ func TestUserService_GetUserById(t *testing.T) {
 	require.NotNil(t, userResponse)
 	require.Equal(t, userResponse.UserName, userRequest.UserName)
 
-	getuserRequest := Request.GetUser{ID: userResponse.ID.Hex()}
-	getUserResponse, err := userService.GetUserById(getuserRequest)
+	getUserResponse, err := userService.GetUserById(userResponse.ID.Hex())
 	require.NoError(t, err)
 	require.NotEmpty(t, getUserResponse)
 	require.NotNil(t, getUserResponse)
@@ -135,8 +133,8 @@ func TestUserService_UpdateUser(t *testing.T) {
 	require.NotNil(t, userResponse)
 	require.Equal(t, userResponse.UserName, userRequest.UserName)
 
-	updateUserRequest := Request.UpdateUserRequest{ID: userResponse.ID.Hex(), UserName: Helper.RandomString(5)}
-	updateUserRespose, err := userService.UpdateUser(updateUserRequest)
+	updateUserRequest := Request.UpdateUserRequest{UserName: Helper.RandomString(5)}
+	updateUserRespose, err := userService.UpdateUser(updateUserRequest, userResponse.ID.Hex())
 	require.NoError(t, err)
 	require.NotNil(t, updateUserRespose)
 	require.NotEqual(t, updateUserRespose.UserName, username)
