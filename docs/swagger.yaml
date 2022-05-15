@@ -1,5 +1,14 @@
 basePath: /api/v1
 definitions:
+  Entity.Ingredient:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   Entity.Permission:
     properties:
       id:
@@ -54,6 +63,14 @@ definitions:
     required:
     - currentPassword
     - newPassword
+    type: object
+  Request.CreateIngredientRequest:
+    properties:
+      name:
+        minLength: 3
+        type: string
+    required:
+    - name
     type: object
   Request.CreatePermission:
     properties:
@@ -168,7 +185,43 @@ info:
   title: Golang Monolithic Boilerplate
   version: "1.0"
 paths:
-  /auth/logout:
+  /authentication/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user with username and password
+      parameters:
+      - description: Create user request
+        in: body
+        name: LoginUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Response.LoginUserResponse'
+              type: object
+        "400":
+          description: when user not exist or password is incorrect
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      summary: Login user
+      tags:
+      - Auth
+  /authentication/logout:
     delete:
       consumes:
       - application/json
@@ -204,7 +257,7 @@ paths:
       summary: Logout user
       tags:
       - Auth
-  /auth/newToken:
+  /authentication/newToken:
     post:
       consumes:
       - application/json
@@ -240,6 +293,81 @@ paths:
       summary: New access token
       tags:
       - Auth
+  /ingredient:
+    get:
+      consumes:
+      - application/json
+      description: Get All Ingredients
+      parameters:
+      - description: filter ingredients with name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/Entity.Ingredient'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Ingredients
+      tags:
+      - Ingredient
+    post:
+      consumes:
+      - application/json
+      description: Create Ingredient
+      parameters:
+      - description: Create Ingreedient request
+        in: body
+        name: CreateIngredientRequest
+        required: true
+        schema:
+          $ref: '#/definitions/Request.CreateIngredientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/Entity.Ingredient'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/Response.GeneralResponse'
+            - properties:
+                data:
+                  type: object
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Ingredient
+      tags:
+      - Ingredient
   /permission:
     get:
       consumes:
@@ -945,42 +1073,6 @@ paths:
       summary: Change user password
       tags:
       - User
-  /user/login:
-    post:
-      consumes:
-      - application/json
-      description: Login user with username and password
-      parameters:
-      - description: Create user request
-        in: body
-        name: LoginUserRequest
-        required: true
-        schema:
-          $ref: '#/definitions/Request.CreateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/Response.LoginUserResponse'
-              type: object
-        "400":
-          description: when user not exist or password is incorrect
-          schema:
-            allOf:
-            - $ref: '#/definitions/Response.GeneralResponse'
-            - properties:
-                data:
-                  type: object
-              type: object
-      summary: Login user
-      tags:
-      - Auth
 securityDefinitions:
   ApiKeyAuth:
     in: header

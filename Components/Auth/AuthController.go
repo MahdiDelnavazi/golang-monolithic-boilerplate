@@ -30,7 +30,7 @@ func NewAuthController(authService *AuthService) *AuthController {
 // @Param        AccessTokenRequest  body      AuthRequest.AccessTokenRequest  true  "for get new access token"
 // @Success      200                {object}  Response.GeneralResponse{data=User.AccessTokenRequest}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} ""
-// @Router       /auth/newToken [post]
+// @Router       /authentication/newToken [post]
 //
 // LoginUser for get access token
 func (authController *AuthController) AccessToken(context *gin.Context) {
@@ -67,7 +67,7 @@ func (authController *AuthController) AccessToken(context *gin.Context) {
 // @Param        LoginUserRequest  body      Request.CreateUserRequest  true  "Create user request"
 // @Success      200                {object}  Response.GeneralResponse{data=UserResponse.LoginUserResponse}
 // @Failure      400                {object}  Response.GeneralResponse{data=object} "when user not exist or password is incorrect"
-// @Router       /user/login [post]
+// @Router       /authentication/login [post]
 //
 // LoginUser for get access token
 func (authController *AuthController) LoginUser(context *gin.Context) {

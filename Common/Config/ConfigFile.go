@@ -4,6 +4,7 @@ import "time"
 
 type EnvironmentConfig struct {
 	Api struct {
+		IsDevelop       bool          `env-default:"true"`
 		ApiHost         string        `env:"API_HOST" env-default:"localhost:3000"`
 		ReadTimeOut     time.Duration `env:"API_READ_TIMEOUT" env-default:"5s"`
 		WriteTimeOut    time.Duration `env:"API_WRITE_TIMEOUT" env-default:"5s"`

@@ -5,6 +5,7 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Common/Middleware"
 	Auth "github.com/mahdidl/golang_boilerplate/Components/Auth"
 	AuthUser "github.com/mahdidl/golang_boilerplate/Components/AuthUser"
+	"github.com/mahdidl/golang_boilerplate/Components/Ingredient"
 	"github.com/mahdidl/golang_boilerplate/Components/Permission"
 	"github.com/mahdidl/golang_boilerplate/Components/Role"
 	RolePermission "github.com/mahdidl/golang_boilerplate/Components/RolePermission"
@@ -21,6 +22,7 @@ import (
 
 const (
 	prefix                = "/api/v1"
+	ingredientPostfix     = "/ingredient"
 	usersPostfix          = "/user"
 	ticketPostfix         = "/ticket"
 	authenticationPostfix = "/authentication"
@@ -48,6 +50,16 @@ func Routes(app *gin.Engine) {
 		})
 	})
 
+	// ingredient dependencies
+	ingredientRepository := Ingredient.NewIngredientRepository()
+	ingredientService := Ingredient.NewIngredientService(ingredientRepository)
+	ingredientController := Ingredient.NewIngredientController(ingredientService)
+	ingredientRouter := router.Group(ingredientPostfix).Use(Middleware.AuthMiddleware())
+	{
+		ingredientRouter.POST("", ingredientController.CreateIngredient)
+		ingredientRouter.GET("", ingredientController.GetAllIngredient)
+	}
+
 	userRepository := User.NewUserRepository()
 	userService := User.NewUserService(userRepository)
 	userController := User.NewUserController(userService)
@@ -66,7 +78,7 @@ func Routes(app *gin.Engine) {
 	}
 	userRouter = router.Group(usersPostfix)
 	{
-		userRouter.POST("/create", userController.CreateUser)
+		userRouter.POST("/", userController.CreateUser)
 	}
 
 	authUserRepository := AuthUser.NewAuthUserRepository()
