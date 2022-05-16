@@ -20,7 +20,7 @@ func NewAuthRepository() *AuthRepository {
 func (authRepository *AuthRepository) LoginUser(loginUserRequest Request.LoginUserRequest) (Entity.User, error) {
 	user := Entity.User{}
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"UserName": loginUserRequest.UserName}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"UserName": loginUserRequest.UserName}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}

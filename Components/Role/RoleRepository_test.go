@@ -47,11 +47,9 @@ func TestRoleRepository_Delete(t *testing.T) {
 
 	id := role.Id.Hex()
 
-	deleteReq := Request.DeleteRole{Id: id}
-
-	roleDeleted, err := roleRepository.Delete(deleteReq)
+	roleDeleted, err := roleRepository.Delete(id)
 	require.NoError(t, err)
-	require.Equal(t, role.Id.Hex(), deleteReq.Id)
+	require.Equal(t, role.Id.Hex(), id)
 	require.NotEmpty(t, roleDeleted)
 	require.NotNil(t, roleDeleted.DeletedAt)
 
@@ -115,9 +113,9 @@ func TestRoleRepository_Update(t *testing.T) {
 
 	id := role.Id.Hex()
 	rand.Seed(time.Now().UnixNano())
-	updateReq := Request.UpdateRole{Id: id, Name: Helper.RandomString(5)}
+	updateReq := Request.UpdateRole{Name: Helper.RandomString(5)}
 
-	updatedRole, err := roleRepository.Update(updateReq)
+	updatedRole, err := roleRepository.Update(updateReq, id)
 	require.NoError(t, err)
 	require.Equal(t, role.Id, updatedRole.Id)
 	require.NotEmpty(t, updatedRole)

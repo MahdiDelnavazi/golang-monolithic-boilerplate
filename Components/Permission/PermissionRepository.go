@@ -20,12 +20,12 @@ func NewPermissionRepository() *PermissionRepository {
 func (permissionRepository *PermissionRepository) CreateNewPermission(request Request.CreatePermission) (Entity.Permission, error) {
 	permission := Entity.Permission{}
 
-	result, err := Config.PermissionCollection.InsertOne(Config.DBCtx, Entity.Permission{Id: primitive.NewObjectID(), Name: request.Name})
+	result, err := Config.PermissionCollection.InsertOne(Config.DBContext, Entity.Permission{Id: primitive.NewObjectID(), Name: request.Name})
 	if err != nil {
 		return Entity.Permission{}, err
 	}
 
-	if err = Config.PermissionCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&permission); err != nil {
+	if err = Config.PermissionCollection.FindOne(Config.DBContext, bson.M{"_id": result.InsertedID}).Decode(&permission); err != nil {
 		return Entity.Permission{}, err
 	}
 
@@ -35,13 +35,13 @@ func (permissionRepository *PermissionRepository) CreateNewPermission(request Re
 func (permissionRepository *PermissionRepository) GetPermissions(request Request.GetAllPermissions) ([]Entity.Permission, error) {
 	var permissions = make([]Entity.Permission, 0)
 
-	permissionCursor, queryError := Config.PermissionCollection.Find(Config.DBCtx, bson.M{}, Helper.NewMongoPaginate(request.Limit, request.Page).GetPaginatedOpts())
+	permissionCursor, queryError := Config.PermissionCollection.Find(Config.DBContext, bson.M{}, Helper.NewMongoPaginate(request.Limit, request.Page).GetPaginatedOpts())
 	if queryError != nil {
 		return nil, queryError
 	}
 
 	// decode permission and append to list
-	for permissionCursor.Next(Config.DBCtx) {
+	for permissionCursor.Next(Config.DBContext) {
 		var permission Entity.Permission
 		if err := permissionCursor.Decode(&permission); err != nil {
 			log.Println(err)

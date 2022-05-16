@@ -22,17 +22,17 @@ func (ingredientRepository *IngredientRepository) CreateIngredient(name string) 
 	var ingredient Entity.Ingredient
 
 	// check if ingredient is not exist
-	Config.IngredientCollection.FindOne(Config.DBCtx, bson.M{"Name": name}).Decode(&ingredient)
+	Config.IngredientCollection.FindOne(Config.DBContext, bson.M{"Name": name}).Decode(&ingredient)
 	if ingredient.Name != "" {
 		return Entity.Ingredient{}, errors.New("ingredient is exist")
 	}
 
-	result, err := Config.IngredientCollection.InsertOne(Config.DBCtx, Entity.Ingredient{Id: primitive.NewObjectID(), Name: name, CreatedAt: time.Now()})
+	result, err := Config.IngredientCollection.InsertOne(Config.DBContext, Entity.Ingredient{Id: primitive.NewObjectID(), Name: name, CreatedAt: time.Now()})
 	if err != nil {
 		return Entity.Ingredient{}, err
 	}
 
-	err = Config.IngredientCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&ingredient)
+	err = Config.IngredientCollection.FindOne(Config.DBContext, bson.M{"_id": result.InsertedID}).Decode(&ingredient)
 	if err != nil {
 		return Entity.Ingredient{}, err
 	}
@@ -47,16 +47,16 @@ func (ingredientRepository *IngredientRepository) getAllIngredients(filter strin
 	// if we have filter option we filter list with it , else we return whole list of ingredients
 	var filterQuery = bson.M{}
 	if filter != "" {
-		filterQuery = bson.M{"Name": filter}
+		filterQuery = bson.M{"Name": bson.M{"$regex": filter}}
 	}
 
-	userCursor, queryError := Config.IngredientCollection.Find(Config.DBCtx, filterQuery)
+	userCursor, queryError := Config.IngredientCollection.Find(Config.DBContext, filterQuery)
 	if queryError != nil {
 		return nil, queryError
 	}
 
 	// decode users and append to list
-	for userCursor.Next(Config.DBCtx) {
+	for userCursor.Next(Config.DBContext) {
 		var ingredient Entity.Ingredient
 		if err := userCursor.Decode(&ingredient); err != nil {
 			log.Println(err)

@@ -31,7 +31,7 @@ func (rolePermissionRepository UserRoleRepository) Attach(userId string, roleId 
 		return Entity.UserRole{}, errors.New("invalid role id")
 	}
 
-	if err = Config.RoleCollection.FindOne(Config.DBCtx, bson.M{"_id": objectRoleId}).Decode(&role); err != nil {
+	if err = Config.RoleCollection.FindOne(Config.DBContext, bson.M{"_id": objectRoleId}).Decode(&role); err != nil {
 		return Entity.UserRole{}, errors.New("role not found")
 	}
 
@@ -39,7 +39,7 @@ func (rolePermissionRepository UserRoleRepository) Attach(userId string, roleId 
 		{"$set", bson.D{{"RoleId", objectRoleId}, {"UpdatedAt", time.Now()}}},
 	}
 
-	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": objectUserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": objectUserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if resultErr != nil {
 		return Entity.UserRole{}, resultErr
 	}
@@ -58,7 +58,7 @@ func (rolePermissionRepository UserRoleRepository) Detach(userId string) (Entity
 		{"$set", bson.D{{"RoleId", nil}, {"UpdatedAt", time.Now()}}},
 	}
 
-	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": objectUserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	resultErr := Config.UserCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": objectUserId}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if resultErr != nil {
 
 		return Entity.UserRole{}, resultErr

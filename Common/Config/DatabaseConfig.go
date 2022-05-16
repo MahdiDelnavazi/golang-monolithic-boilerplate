@@ -34,7 +34,7 @@ var (
 	PermissionCollection     *mongo.Collection
 	RolePermissionCollection *mongo.Collection
 	IngredientCollection     *mongo.Collection
-	DBCtx                    = context.TODO()
+	DBContext                = context.TODO()
 	err                      error
 )
 
@@ -43,7 +43,7 @@ func MongoDatabaseOpen(cfg MongoDB) {
 	// err from connect method.
 	client, ctx, _, err := connect(cfg.Url)
 	if err != nil {
-		panic(err)
+		panic("err")
 	}
 
 	DBMongo = client.Database(cfg.DBname)

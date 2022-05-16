@@ -25,13 +25,13 @@ func NewUserRepository() *UserRepository {
 func (userRepository *UserRepository) CreateUser(creatUserRequest Request.CreateUserRequest) (Entity.User, error) {
 	user := Entity.User{}
 
-	result, err := Config.UserCollection.InsertOne(Config.DBCtx, Entity.User{ID: primitive.NewObjectID(), IsActive: true,
+	result, err := Config.UserCollection.InsertOne(Config.DBContext, Entity.User{ID: primitive.NewObjectID(), IsActive: true,
 		UserName: creatUserRequest.UserName, Password: creatUserRequest.Password, CreatedAt: time.Now()})
 	if err != nil {
 		return Entity.User{}, err
 	}
 
-	if err = Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&user); err != nil {
+	if err = Config.UserCollection.FindOne(Config.DBContext, bson.M{"_id": result.InsertedID}).Decode(&user); err != nil {
 		return Entity.User{}, err
 	}
 
@@ -42,7 +42,7 @@ func (userRepository *UserRepository) CreateUser(creatUserRequest Request.Create
 func (userRepository *UserRepository) LoginUser(loginUserRequest Request.LoginUserRequest) (Entity.User, error) {
 	user := Entity.User{}
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"UserName": loginUserRequest.UserName}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"UserName": loginUserRequest.UserName}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, queryError
 	}
@@ -58,7 +58,7 @@ func (userRepository *UserRepository) CheckUserName(creatUserRequest Request.Cre
 	user := Entity.User{}
 	//queryError := Config.PostgresDB.Get(&user, `SELECT * FROM checkuserexist($1)`, creatUserRequest.UserName)
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"UserName": creatUserRequest.UserName}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"UserName": creatUserRequest.UserName}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, nil
 	}
@@ -68,7 +68,7 @@ func (userRepository *UserRepository) CheckUserName(creatUserRequest Request.Cre
 func (usserRepository *UserRepository) GetUserByUsername(username string) (Entity.User, error) {
 	var user Entity.User
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"UserName": username}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"UserName": username}).Decode(&user)
 
 	if queryError != nil {
 		return Entity.User{}, queryError
@@ -84,7 +84,7 @@ func (usserRepository *UserRepository) GetUserById(id string) (Entity.User, erro
 		return Entity.User{}, fmt.Errorf("id is not valid")
 	}
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"_id": id1}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
@@ -101,7 +101,7 @@ func (usserRepository *UserRepository) UpdateUser(request Request.UpdateUserRequ
 	update := bson.D{
 		{"$set", bson.D{{"UserName", request.UserName}, {"UpdatedAt", time.Now()}}},
 	}
-	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	result := Config.UserCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 
 	if result != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
@@ -118,7 +118,7 @@ func (usserRepository *UserRepository) ChangePassword(request Request.ChangePass
 		return Entity.User{}, fmt.Errorf("id is not valid")
 	}
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"_id": id1}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
@@ -132,7 +132,7 @@ func (usserRepository *UserRepository) ChangePassword(request Request.ChangePass
 	update := bson.D{
 		{"$set", bson.D{{"Password", hashedPassword}, {"UpdatedAt", time.Now()}}},
 	}
-	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	result := Config.UserCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	if result != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
@@ -142,13 +142,13 @@ func (usserRepository *UserRepository) ChangePassword(request Request.ChangePass
 func (userRepository *UserRepository) GetAllUsers(page int, limit int) ([]Entity.User, error) {
 	var userList = make([]Entity.User, 0)
 
-	userCursor, queryError := Config.UserCollection.Find(Config.DBCtx, bson.M{}, Helper.NewMongoPaginate(limit, page).GetPaginatedOpts())
+	userCursor, queryError := Config.UserCollection.Find(Config.DBContext, bson.M{}, Helper.NewMongoPaginate(limit, page).GetPaginatedOpts())
 	if queryError != nil {
 		return nil, queryError
 	}
 
 	// decode users and append to list
-	for userCursor.Next(Config.DBCtx) {
+	for userCursor.Next(Config.DBContext) {
 		var user Entity.User
 		if err := userCursor.Decode(&user); err != nil {
 			log.Println(err)
@@ -168,7 +168,7 @@ func (userRepository *UserRepository) ChangeActiveStatus(userId string) (Entity.
 	}
 
 	fmt.Println("user", user, id1)
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": id1}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"_id": id1}).Decode(&user)
 	if queryError != nil {
 		return Entity.User{}, fmt.Errorf("user not found")
 	}
@@ -177,7 +177,7 @@ func (userRepository *UserRepository) ChangeActiveStatus(userId string) (Entity.
 	update := bson.D{
 		{"$set", bson.D{{"IsActive", !user.IsActive}, {"UpdatedAt", time.Now()}}},
 	}
-	result := Config.UserCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
+	result := Config.UserCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&user)
 	fmt.Println("user", user)
 	if result != nil {
 		return Entity.User{}, fmt.Errorf("user not found")

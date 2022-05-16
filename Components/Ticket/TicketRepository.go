@@ -30,18 +30,18 @@ func (TicketRepository *TicketRepository) Create(request Ticket.CreateTicketRequ
 		return Entity.Ticket{}, fmt.Errorf("id is not valid")
 	}
 
-	queryError := Config.UserCollection.FindOne(Config.DBCtx, bson.M{"_id": primitiveUserId}).Decode(&user)
+	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"_id": primitiveUserId}).Decode(&user)
 	if queryError != nil {
 		return Entity.Ticket{}, fmt.Errorf("user not found")
 	}
 
-	result, queryError := Config.TicketCollection.InsertOne(Config.DBCtx, Entity.Ticket{ID: primitive.NewObjectID(), UserId: primitiveUserId,
+	result, queryError := Config.TicketCollection.InsertOne(Config.DBContext, Entity.Ticket{ID: primitive.NewObjectID(), UserId: primitiveUserId,
 		Subject: request.Subject, Message: request.Message, CreatedAt: time.Now()})
 
 	if queryError != nil {
 		return Entity.Ticket{}, nil
 	}
-	if err := Config.TicketCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&ticket); err != nil {
+	if err := Config.TicketCollection.FindOne(Config.DBContext, bson.M{"_id": result.InsertedID}).Decode(&ticket); err != nil {
 		return Entity.Ticket{}, err
 	}
 	return ticket, queryError

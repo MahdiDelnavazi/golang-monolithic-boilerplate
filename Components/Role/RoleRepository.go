@@ -24,12 +24,12 @@ func (roleRepository *RoleRepository) Create(request Request.CreateRole) (Entity
 	role := Entity.Role{}
 	slicePermissionId := make([]primitive.ObjectID, 0)
 
-	result, err := Config.RoleCollection.InsertOne(Config.DBCtx, Entity.Role{Id: primitive.NewObjectID(), Name: request.Name, CreatedAt: time.Now(), PermissionsId: slicePermissionId})
+	result, err := Config.RoleCollection.InsertOne(Config.DBContext, Entity.Role{Id: primitive.NewObjectID(), Name: request.Name, CreatedAt: time.Now(), PermissionsId: slicePermissionId})
 	if err != nil {
 		return Entity.Role{}, err
 	}
 
-	if err = Config.RoleCollection.FindOne(Config.DBCtx, bson.M{"_id": result.InsertedID}).Decode(&role); err != nil {
+	if err = Config.RoleCollection.FindOne(Config.DBContext, bson.M{"_id": result.InsertedID}).Decode(&role); err != nil {
 		return Entity.Role{}, err
 	}
 
@@ -39,13 +39,13 @@ func (roleRepository *RoleRepository) Create(request Request.CreateRole) (Entity
 func (roleRepository *RoleRepository) Get(request Request.GetAllRole) ([]Entity.Role, error) {
 	var roles = make([]Entity.Role, 0)
 
-	roleCursor, queryError := Config.RoleCollection.Find(Config.DBCtx, bson.M{}, Helper.NewMongoPaginate(request.Limit, request.Page).GetPaginatedOpts())
+	roleCursor, queryError := Config.RoleCollection.Find(Config.DBContext, bson.M{}, Helper.NewMongoPaginate(request.Limit, request.Page).GetPaginatedOpts())
 	if queryError != nil {
 		return nil, queryError
 	}
 
 	// decode permission and append to list
-	for roleCursor.Next(Config.DBCtx) {
+	for roleCursor.Next(Config.DBContext) {
 		var role Entity.Role
 		if err := roleCursor.Decode(&role); err != nil {
 			log.Println(err)
@@ -64,7 +64,7 @@ func (roleRepository RoleRepository) GetRoleById(Id string) (Entity.Role, error)
 		return Entity.Role{}, fmt.Errorf("id is not valid")
 	}
 
-	queryError := Config.RoleCollection.FindOne(Config.DBCtx, bson.M{"_id": objectiveId}).Decode(&role)
+	queryError := Config.RoleCollection.FindOne(Config.DBContext, bson.M{"_id": objectiveId}).Decode(&role)
 	if queryError != nil {
 		return Entity.Role{}, fmt.Errorf("role not found")
 	}
@@ -83,7 +83,7 @@ func (roleRepository RoleRepository) Update(request Request.UpdateRole, roleId s
 		{"$set", bson.D{{"Name", request.Name}, {"UpdatedAt", time.Now()}}},
 	}
 
-	result := Config.RoleCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&role)
+	result := Config.RoleCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&role)
 
 	if result != nil {
 		return Entity.Role{}, fmt.Errorf("role not found")
@@ -102,7 +102,7 @@ func (roleRepository RoleRepository) Delete(roleId string) (Entity.Role, error) 
 		{"$set", bson.D{{"DeletedAt", time.Now()}}},
 	}
 
-	result := Config.RoleCollection.FindOneAndUpdate(Config.DBCtx, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&role)
+	result := Config.RoleCollection.FindOneAndUpdate(Config.DBContext, bson.M{"_id": id1}, update, options.FindOneAndUpdate().SetReturnDocument(options.After)).Decode(&role)
 
 	if result != nil {
 		return Entity.Role{}, fmt.Errorf("role not found")

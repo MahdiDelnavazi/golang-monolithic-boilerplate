@@ -46,6 +46,7 @@ func OpenTestingDatabase() {
 	Config.RoleCollection = Config.DBMongo.Collection("Role")
 	Config.PermissionCollection = Config.DBMongo.Collection("Permission")
 	Config.RolePermissionCollection = Config.DBMongo.Collection("RolePermission")
+	Config.IngredientCollection = Config.DBMongo.Collection("Ingredient")
 }
 
 //func OpenTestingRedis() {

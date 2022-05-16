@@ -6,7 +6,6 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Components/Permission/Request"
 	"github.com/mahdidl/golang_boilerplate/Components/Role"
 	RequestRole "github.com/mahdidl/golang_boilerplate/Components/Role/Request"
-	Request2 "github.com/mahdidl/golang_boilerplate/Components/RolePermission/Request"
 	"github.com/mahdidl/golang_boilerplate/Test"
 	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,8 +43,7 @@ func TestRolePermissionRepository_Attach(t *testing.T) {
 	require.NotNil(t, role)
 	require.Equal(t, permission.Name, permissionName)
 
-	attachRolePermissionRequest := Request2.AttachPermission{PermissionId: permission.Id.Hex(), RoleId: role.Id.Hex()}
-	AttachedRolePermission, err := rolePermissionRepository.Attach(attachRolePermissionRequest)
+	AttachedRolePermission, err := rolePermissionRepository.Attach(permission.Id.Hex(), role.Id.Hex())
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 	require.NotNil(t, role)
@@ -72,15 +70,13 @@ func TestRolePermissionRepository_Detach(t *testing.T) {
 	require.NotNil(t, role)
 	require.Equal(t, permission.Name, permissionName)
 
-	attachRolePermissionRequest := Request2.AttachPermission{PermissionId: permission.Id.Hex(), RoleId: role.Id.Hex()}
-	AttachedRolePermission, err := rolePermissionRepository.Attach(attachRolePermissionRequest)
+	AttachedRolePermission, err := rolePermissionRepository.Attach(permission.Id.Hex(), role.Id.Hex())
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 	require.NotNil(t, role)
 	require.NotEqual(t, AttachedRolePermission.PermissionsId[0], primitive.NilObjectID)
 
-	detachRolePermissionRequest := Request2.DetachPermission{PermissionId: permission.Id.Hex(), RoleId: role.Id.Hex()}
-	detachedRolePermission, err := rolePermissionRepository.Detach(detachRolePermissionRequest)
+	detachedRolePermission, err := rolePermissionRepository.Detach(permission.Id.Hex(), role.Id.Hex())
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 	require.NotNil(t, role)
