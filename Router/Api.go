@@ -5,11 +5,9 @@ import (
 	"github.com/mahdidl/golang_boilerplate/Common/Middleware"
 	Auth "github.com/mahdidl/golang_boilerplate/Components/Auth"
 	AuthUser "github.com/mahdidl/golang_boilerplate/Components/AuthUser"
-	"github.com/mahdidl/golang_boilerplate/Components/Ingredient"
 	"github.com/mahdidl/golang_boilerplate/Components/Permission"
 	"github.com/mahdidl/golang_boilerplate/Components/Role"
 	RolePermission "github.com/mahdidl/golang_boilerplate/Components/RolePermission"
-	"github.com/mahdidl/golang_boilerplate/Components/Ticket"
 	User "github.com/mahdidl/golang_boilerplate/Components/User"
 	"github.com/mahdidl/golang_boilerplate/Components/UserRole"
 	"github.com/mahdidl/golang_boilerplate/docs"
@@ -50,16 +48,6 @@ func Routes(app *gin.Engine) {
 		})
 	})
 
-	// ingredient dependencies
-	ingredientRepository := Ingredient.NewIngredientRepository()
-	ingredientService := Ingredient.NewIngredientService(ingredientRepository)
-	ingredientController := Ingredient.NewIngredientController(ingredientService)
-	ingredientRouter := router.Group(ingredientPostfix).Use(Middleware.AuthMiddleware())
-	{
-		ingredientRouter.POST("", ingredientController.CreateIngredient)
-		ingredientRouter.GET("", ingredientController.GetAllIngredient)
-	}
-
 	userRepository := User.NewUserRepository()
 	userService := User.NewUserService(userRepository)
 	userController := User.NewUserController(userService)
@@ -99,15 +87,6 @@ func Routes(app *gin.Engine) {
 	}
 	authUserRouter = router.Group(authenticationPostfix).Use()
 	authUserRouter.POST("/login", authController.LoginUser)
-
-	ticketRepository := Ticket.NewTicketRepository()
-	ticketService := Ticket.NewTicketService(userService, ticketRepository)
-	ticketController := Ticket.NewTicketController(ticketService)
-	tickerRouter := router.Group(ticketPostfix).Use(Middleware.AuthMiddleware())
-	{
-		// Post Requests
-		tickerRouter.POST("/create/:userId", ticketController.CreateTicket)
-	}
 
 	permissionRepository := Permission.NewPermissionRepository()
 	permissionService := Permission.NewPermissionService(permissionRepository)

@@ -33,7 +33,6 @@ var (
 	RoleCollection           *mongo.Collection
 	PermissionCollection     *mongo.Collection
 	RolePermissionCollection *mongo.Collection
-	IngredientCollection     *mongo.Collection
 	DBContext                = context.TODO()
 	err                      error
 )
@@ -54,7 +53,6 @@ func MongoDatabaseOpen(cfg MongoDB) {
 	RoleCollection = DBMongo.Collection("Role")
 	PermissionCollection = DBMongo.Collection("Permission")
 	RolePermissionCollection = DBMongo.Collection("RolePermission")
-	IngredientCollection = DBMongo.Collection("Ingredient")
 }
 
 func connect(uri string) (*mongo.Client, context.Context,
