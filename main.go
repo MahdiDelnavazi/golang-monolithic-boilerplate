@@ -21,45 +21,27 @@ import (
 // @host                        localhost:3000
 // @BasePath                    /api/v1
 func main() {
-
-	// =====================================================
 	// Open Config file
 	config := Config.EnvironmentConfig{}
-	if parseError := cleanenv.ReadConfig(".env", &config); parseError != nil {
+	if parseError := cleanenv.ReadConfig(".test.env", &config); parseError != nil {
 		fmt.Errorf("parsing config: %w", parseError)
 	}
 
-	// =====================================================
 	// Config logger
 	Config.NewLogger("Polaris Storage Service", config.DB.Host)
 
-	// =====================================================
-	// Open Test Connection
-	//Config.MongoDatabaseOpen(Config.DatabaseConfig{
-	//	User:         config.DB.User,
-	//	Password:     config.DB.Password,
-	//	Host:         config.DB.Host,
-	//	Name:         config.DB.Name,
-	//	MaxIdleConns: config.DB.MaxIdleConns,
-	//	MaxOpenConns: config.DB.MaxOpenConns,
-	//	DisableTLS:   config.DB.DisableTLS,
-	//})
-
+	// connect to mongodb
 	Config.MongoDatabaseOpen(Config.MongoDB{Url: config.MongoDB.Url, DBname: config.MongoDB.DBname})
-	//defer func() {
-	//	Config.DB.Close()
-	//	fmt.Println("database in disconnected ")
-	//}()
 
-	// =====================================================
+	// disconnect client mongodb
+	defer Config.CloseClientDB()
+
 	// Create new token maker
 	token.NewPasetoMaker(config.Token.TokenSymmetricKey)
 
-	// =====================================================
 	// Create new token maker
 	Config.RedisConnection(config)
 
-	// =====================================================
 	// Run server
 	app := gin.Default()
 	app.MaxMultipartMemory = 8 << 20

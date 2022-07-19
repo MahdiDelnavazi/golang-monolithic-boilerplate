@@ -17,11 +17,13 @@ type RedisConfig struct {
 	Port     string
 }
 
+// MongoDBTest is a struct for create test database
 type MongoDBTest struct {
 	Url    string `env:"DB_URL" env-default:"mongodb://localhost:27017"`
 	DBname string `env:"DB_NAME_TEST" env-default:"golang_monolithic_boilerplate_test"`
 }
 
+// OpenTestingDatabase is a func for connect to testing database
 func OpenTestingDatabase() {
 	config := MongoDBTest{}
 
@@ -46,7 +48,6 @@ func OpenTestingDatabase() {
 	Config.RoleCollection = Config.DBMongo.Collection("Role")
 	Config.PermissionCollection = Config.DBMongo.Collection("Permission")
 	Config.RolePermissionCollection = Config.DBMongo.Collection("RolePermission")
-	Config.IngredientCollection = Config.DBMongo.Collection("Ingredient")
 }
 
 //func OpenTestingRedis() {

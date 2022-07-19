@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 	"time"
 )
 
@@ -82,4 +83,18 @@ func ping(client *mongo.Client, ctx context.Context) error {
 	}
 	fmt.Println("connected successfully")
 	return nil
+}
+
+// CloseClientDB is a func for closing connection to mongodb
+func CloseClientDB() {
+	if DBMongo.Client() == nil {
+		return
+	}
+
+	err := DBMongo.Client().Disconnect(context.TODO())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Connection to MongoDB closed.")
 }
