@@ -17,13 +17,13 @@ type RedisConfig struct {
 	Port     string
 }
 
-// MongoDBTest is a struct for create test database
+// MongoDBTest is a struct for creating the test database
 type MongoDBTest struct {
 	Url    string `env:"DB_URL" env-default:"mongodb://localhost:27017"`
 	DBname string `env:"DB_NAME_TEST" env-default:"golang_monolithic_boilerplate_test"`
 }
 
-// OpenTestingDatabase is a func for connect to testing database
+// OpenTestingDatabase is a func for connecting to test database
 func OpenTestingDatabase() {
 	config := MongoDBTest{}
 

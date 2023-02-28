@@ -13,7 +13,7 @@ import (
 // @version                     1.0
 // @description                 Golang Monolithic Boilerplate
 // @contact.name                Supnex
-// @contact.url                 https://supne.com/
+// @contact.url                 https://supnex.com/
 // @contact.email               team@supnex.com
 // @securityDefinitions.apikey  ApiKeyAuth
 // @in                          header
