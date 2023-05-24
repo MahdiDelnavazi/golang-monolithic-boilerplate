@@ -56,7 +56,6 @@ func (userRepository *UserRepository) LoginUser(loginUserRequest Request.LoginUs
 // CheckUserName check username exist or not
 func (userRepository *UserRepository) CheckUserName(creatUserRequest Request.CreateUserRequest) (Entity.User, error) {
 	user := Entity.User{}
-	//queryError := Config.PostgresDB.Get(&user, `SELECT * FROM checkuserexist($1)`, creatUserRequest.UserName)
 
 	queryError := Config.UserCollection.FindOne(Config.DBContext, bson.M{"UserName": creatUserRequest.UserName}).Decode(&user)
 	if queryError != nil {
